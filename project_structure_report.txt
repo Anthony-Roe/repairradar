@@ -1,0 +1,94 @@
+#!/usr/bin/env node
+const fs = require('fs').promises;
+const path = require('path');
+
+const ROOT_DIR = '.';
+const INCLUDE_DIRS = [
+  'src/app', 'src/components', 'src/shared', 'src/middleware', 
+  'src/lib', 'src/pages', 'prisma', 'src/shared/modules',
+];
+const INCLUDE_FILES = ['next.config.ts', 'tailwind.config.js', 'tsconfig.json', 'prisma/schema.prisma'];
+const EXCLUDE_DIRS = ['node_modules', '.next', 'dist', 'public'];
+const EXCLUDE_FILES = ['.DS_Store', 'package-lock.json', 'yarn.lock'];
+const processedFiles = new Set();
+
+async function fileExists(filePath) {
+  try {
+    await fs.access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function readFileContent(filePath) {
+  try {
+    return await fs.readFile(filePath, 'utf8');
+  } catch (error) {
+    console.error(`Error reading file ${filePath}: ${error.message}`);
+    return `// Error reading file: ${error.message}`;
+  }
+}
+
+async function processDirectory(dirPath, outputLines) {
+  try {
+    const entries = await fs.readdir(dirPath, { withFileTypes: true });
+    for (const entry of entries) {
+      const fullPath = path.join(dirPath, entry.name);
+      const relativePath = path.relative(ROOT_DIR, fullPath);
+
+      if (entry.isDirectory() && !EXCLUDE_DIRS.includes(entry.name)) {
+        if (INCLUDE_DIRS.some((dir) => relativePath.startsWith(dir) || dir.startsWith(relativePath))) {
+          await processDirectory(fullPath, outputLines);
+        }
+      } else if (
+        entry.isFile() &&
+        !EXCLUDE_FILES.includes(entry.name) &&
+        !processedFiles.has(fullPath) &&
+        (INCLUDE_FILES.includes(relativePath) || INCLUDE_DIRS.some((dir) => relativePath.startsWith(dir)))
+      ) {
+        processedFiles.add(fullPath);
+        const content = await readFileContent(fullPath);
+        outputLines.push(`// --- File: .${path.sep}${relativePath} ---`);
+        outputLines.push(content.trim());
+        console.log(`Added: ${relativePath}`);
+      }
+    }
+  } catch (error) {
+    console.error(`Error processing directory ${dirPath}: ${error.message}`);
+  }
+}
+
+async function exportCode() {
+  const outputLines = [];
+
+  for (const file of INCLUDE_FILES) {
+    const fullPath = path.join(ROOT_DIR, file);
+    if (await fileExists(fullPath) && !processedFiles.has(fullPath)) {
+      processedFiles.add(fullPath);
+      const content = await readFileContent(fullPath);
+      outputLines.push(`// --- File: .${path.sep}${file} ---`);
+      outputLines.push(content.trim());
+      console.log(`Added: ${file}`);
+    }
+  }
+
+  for (const dir of INCLUDE_DIRS) {
+    const fullPath = path.join(ROOT_DIR, dir);
+    if (await fileExists(fullPath)) {
+      await processDirectory(fullPath, outputLines);
+    } else {
+      console.log(`Directory not found: ${dir}`);
+    }
+  }
+
+  const output = outputLines.join('\n');
+  console.log(output);
+  await fs.writeFile('exportedCode.txt', output, 'utf8');
+  console.log(`\nExported ${processedFiles.size} files to exportedCode.txt`);
+}
+
+exportCode().catch((error) => {
+  console.error('Export failed:', error);
+  process.exit(1);
+});

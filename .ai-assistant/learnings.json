@@ -1,0 +1,387 @@
+[
+  {
+    "filePath": "middleware.ts",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T19:54:44.368Z"
+  },
+  {
+    "filePath": "shared\\modules\\moduleImports.generated.ts",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T19:55:24.946Z"
+  },
+  {
+    "filePath": "shared\\modules\\moduleManager.ts",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T19:56:12.176Z"
+  },
+  {
+    "filePath": "shared\\modules\\types.ts",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T19:57:52.615Z"
+  },
+  {
+    "filePath": "shared\\modules\\work-orders\\components\\WorkOrdersPage.tsx",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T19:58:00.432Z"
+  },
+  {
+    "filePath": "shared\\modules\\work-orders\\api\\route.ts",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T19:58:47.965Z"
+  },
+  {
+    "filePath": "shared\\modules\\preventative-maintenance\\types.ts",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T19:59:02.328Z"
+  },
+  {
+    "filePath": "shared\\modules\\preventative-maintenance\\components\\PreventativeMaintenancePage.tsx",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T19:59:49.672Z"
+  },
+  {
+    "filePath": "shared\\modules\\preventative-maintenance\\api\\route.ts",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T20:00:34.097Z"
+  },
+  {
+    "filePath": "shared\\modules\\dashboard\\types.ts",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T20:00:46.366Z"
+  },
+  {
+    "filePath": "shared\\modules\\dashboard\\components\\DashboardPage.tsx",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T20:01:22.603Z"
+  },
+  {
+    "filePath": "shared\\modules\\dashboard\\components\\ModuleSummary.tsx",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T20:01:28.996Z"
+  },
+  {
+    "filePath": "shared\\modules\\dashboard\\api\\route.ts",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T20:02:16.285Z"
+  },
+  {
+    "filePath": "shared\\modules\\calls\\components\\CallsPage.tsx",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T20:03:03.446Z"
+  },
+  {
+    "filePath": "shared\\modules\\calls\\api\\route.ts",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T20:04:12.664Z"
+  },
+  {
+    "filePath": "shared\\modules\\assets\\types.ts",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T20:04:54.560Z"
+  },
+  {
+    "filePath": "shared\\modules\\assets\\components\\AssetsPage.tsx",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T20:06:05.733Z"
+  },
+  {
+    "filePath": "shared\\modules\\assets\\api\\route.ts",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T20:06:51.546Z"
+  },
+  {
+    "filePath": "shared\\lib\\db.ts",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T20:06:56.734Z"
+  },
+  {
+    "filePath": "shared\\lib\\hooks\\index.ts",
+    "concepts": [
+      "MVC architecture",
+      "Factory pattern"
+    ],
+    "patterns": [],
+    "dependencies": [
+      "express"
+    ],
+    "timestamp": "2025-03-26T20:07:01.569Z"
+  },
+  {
+    "filePath": "scripts\\ai.ts",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T20:08:03.735Z"
+  },
+  {
+    "filePath": "scripts\\exportCode.js",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T20:09:04.751Z"
+  },
+  {
+    "filePath": "scripts\\generateModuleImports.js",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T20:09:09.910Z"
+  },
+  {
+    "filePath": "scripts\\genPrompt.js",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T20:09:30.222Z"
+  },
+  {
+    "filePath": "scripts\\genStructureReport.js",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T20:10:21.493Z"
+  },
+  {
+    "filePath": "lib\\utils.ts",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T20:10:46.293Z"
+  },
+  {
+    "filePath": "components\\ClientToaster.tsx",
+    "concepts": [
+      "MVC architecture"
+    ],
+    "patterns": [
+      "Factory pattern"
+    ],
+    "dependencies": [
+      "express"
+    ],
+    "timestamp": "2025-03-26T20:10:49.929Z"
+  },
+  {
+    "filePath": "components\\EditDialog.tsx",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T20:11:56.882Z"
+  },
+  {
+    "filePath": "components\\Navbar.tsx",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T20:12:24.461Z"
+  },
+  {
+    "filePath": "components\\SessionWrapper.tsx",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T20:12:49.850Z"
+  },
+  {
+    "filePath": "components\\ThemeWrapper.tsx",
+    "concepts": [
+      "MVC architecture"
+    ],
+    "patterns": [
+      "Factory pattern"
+    ],
+    "dependencies": [
+      "express"
+    ],
+    "timestamp": "2025-03-26T20:12:53.512Z"
+  },
+  {
+    "filePath": "components\\ui\\badge.tsx",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T20:13:24.897Z"
+  },
+  {
+    "filePath": "components\\ui\\button.tsx",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T20:14:06.744Z"
+  },
+  {
+    "filePath": "components\\ui\\calendar.tsx",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T20:14:44.105Z"
+  },
+  {
+    "filePath": "components\\ui\\card.tsx",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T20:15:14.631Z"
+  },
+  {
+    "filePath": "components\\ui\\checkbox.tsx",
+    "concepts": [
+      "MVC architecture"
+    ],
+    "patterns": [
+      "Factory pattern"
+    ],
+    "dependencies": [
+      "express"
+    ],
+    "timestamp": "2025-03-26T20:15:18.825Z"
+  },
+  {
+    "filePath": "components\\ui\\dialog.tsx",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T20:15:55.465Z"
+  },
+  {
+    "filePath": "components\\ui\\dropdown-menu.tsx",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T20:17:26.629Z"
+  },
+  {
+    "filePath": "components\\ui\\input.tsx",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T20:17:50.210Z"
+  },
+  {
+    "filePath": "components\\ui\\label.tsx",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T20:18:26.770Z"
+  },
+  {
+    "filePath": "components\\ui\\popover.tsx",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T20:18:56.137Z"
+  },
+  {
+    "filePath": "components\\ui\\select.tsx",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T20:20:08.653Z"
+  },
+  {
+    "filePath": "components\\ui\\sonner.tsx",
+    "concepts": [
+      "MVC architecture"
+    ],
+    "patterns": [
+      "Factory pattern"
+    ],
+    "dependencies": [
+      "express"
+    ],
+    "timestamp": "2025-03-26T20:20:12.630Z"
+  },
+  {
+    "filePath": "components\\ui\\table.tsx",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T20:21:04.849Z"
+  },
+  {
+    "filePath": "app\\layout.tsx",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T20:21:25.911Z"
+  },
+  {
+    "filePath": "app\\page.tsx",
+    "concepts": [
+      "MVC architecture"
+    ],
+    "patterns": [
+      "Factory pattern"
+    ],
+    "dependencies": [
+      "express"
+    ],
+    "timestamp": "2025-03-26T20:21:29.622Z"
+  },
+  {
+    "filePath": "app\\[tenant]\\page.tsx",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T20:22:29.023Z"
+  },
+  {
+    "filePath": "app\\debug-session\\page.tsx",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T20:22:47.855Z"
+  },
+  {
+    "filePath": "app\\auth\\signin\\page.tsx",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T20:23:08.018Z"
+  },
+  {
+    "filePath": "app\\api\\[module]\\route.ts",
+    "concepts": [],
+    "patterns": [],
+    "dependencies": [],
+    "timestamp": "2025-03-26T20:24:15.578Z"
+  }
+]
