@@ -130,11 +130,6 @@ async function handleRequest(req: NextRequest, method: string, module: string) {
 
   if (!config) return NextResponse.json({ error: `Invalid module: ${module}` }, { status: 404 });
 
-  if (module === "dashboard") {
-    if (method !== "GET") return NextResponse.json({ error: "Method not allowed for dashboard" }, { status: 405 });
-    return handleDashboardRequest(req, subdomain);
-  }
-
   if (!subdomain) return NextResponse.json({ error: "Subdomain is required" }, { status: 400 });
   const tenant = await prisma.tenants.findUnique({
     where: { subdomain, deletedAt: null },
