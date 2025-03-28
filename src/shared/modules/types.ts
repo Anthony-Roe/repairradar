@@ -9,11 +9,10 @@ export type ModuleConfig = Record<string, boolean>;
 export interface TenantConfig {
   id: string;
   tenantId: string;
-  modules: string;
-  theme?: { primaryColor?: string; logoUrl?: string };
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt: Date | null;
+  modules?: Record<string, boolean>;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
 }
 
 export interface CreateCallInput {

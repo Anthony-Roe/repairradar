@@ -1,38 +1,33 @@
-// File: E:\Dev\websites\repairradar\src\middleware.ts
 import { NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
+import type { NextRequest } from "next/server";
+import supabase from "@/lib/supabase";
 
-export async function middleware(request) {
-  const { pathname } = request.nextUrl;
+export async function middleware(request: NextRequest) {
+  const path = request.nextUrl.pathname;
+  const isPublicPath = path.startsWith("/auth");
 
-  // Skip middleware for static files, auth routes, and favicon
-  if (
-    pathname.startsWith("/_next") ||
-    pathname.startsWith("/api/auth") ||
-    pathname === "/auth/signin" ||
-    pathname === "/favicon.ico"
-  ) {
+  if (isPublicPath) {
     return NextResponse.next();
   }
 
-  // Get the session token using next-auth/jwt
-  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+  const token = request.cookies.get("sb-access-token")?.value;
 
-  // If token exists, user is authenticated; proceed
-  if (token) {
-    return NextResponse.next();
+  if (!token) {
+    return NextResponse.redirect(new URL("/auth/signin", request.url));
   }
 
-  // No token: handle API routes vs. page routes
-  if (pathname.startsWith("/api/")) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const { data, error } = await supabase.auth.getUser(token);
+
+  if (error || !data?.user) {
+    return NextResponse.redirect(new URL("/auth/signin", request.url));
   }
 
-  // Redirect to sign-in for protected pages
-  const signInUrl = new URL("/auth/signin", request.url);
-  return NextResponse.redirect(signInUrl);
+  const response = NextResponse.next();
+  response.headers.set("X-User-TenantId", data.user.user_metadata?.tenantId || "");
+
+  return response;
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/dashboard/:path*", "/profile/:path*", "/admin/:path*"],
 };

@@ -1,23 +1,30 @@
 "use client";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { toast } from "sonner"; // Import toast directly from sonner
-import ClientToaster from "@/components/ClientToaster"; // Only import the component
+import { toast } from "sonner";
+import ClientToaster from "@/components/ClientToaster";
 import { Loader2 } from "lucide-react";
 import { ModuleManager } from "@/shared/modules/moduleManager";
+import supabase from "@/lib/supabase";
+import { useApiQuery } from "@/shared/lib/hooks";
+import { TenantConfig } from "@/shared/modules/types";
 
 const ALL_MODULES = ModuleManager.getAllModules();
 
-type Tenant = { id: string; name: string; subdomain: string; config?: { modules: Record<string, boolean> } | null; deletedAt: string | null };
+type Tenant = {
+  id: string;
+  name: string;
+  subdomain: string;
+  config?: { modules: Record<string, boolean> } | null;
+  deletedAt: string | null;
+};
 type ModuleConfig = Record<string, boolean>;
 
 export default function AdminPanel() {
-  const { data: session, status } = useSession();
   const router = useRouter();
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [newTenant, setNewTenant] = useState<{
@@ -33,29 +40,127 @@ export default function AdminPanel() {
   const [actionLoading, setActionLoading] = useState(false);
   const [actionType, setActionType] = useState<string | null>(null);
   const [targetId, setTargetId] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [session, setSession] = useState<any>(null);
   const isMounted = useRef(false);
+  const { data, loading, error, refetch } = useApiQuery<TenantConfig[]>("tenants", {method: "GET"});
 
-  const fetchTenants = useCallback(async (isInitialFetch = false) => {
-    try {
-      if (isInitialFetch) setInitialLoading(true);
-      const res = await fetch("/api/tenants");
-      if (!res.ok) throw new Error(`Failed to fetch tenants: ${res.statusText}`);
-      setTenants(await res.json());
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An unexpected error occurred");
-      toast.error("Could not load tenants");
-    } finally {
-      if (isInitialFetch) setInitialLoading(false);
-    }
-  }, []); // No dependencies, stable function
+  const handleRefresh = useCallback(async () => {
+      setIsRefreshing(true);
+      await refetch();
+      setIsRefreshing(false);
+    }, [refetch]);
 
   useEffect(() => {
-    if (!isMounted.current && status === "authenticated" && session?.user?.role === "SUPER_ADMIN") {
-      fetchTenants(true); // Initial fetch
+    const fetchSession = async () => {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) {
+        console.error("[AdminPanel] Session fetch error:", error.message);
+        router.push("/auth/signin");
+        return;
+      }
+      setSession(session);
+
+      if (session) {
+        const { data: userData, error: userError } = await supabase
+          .from("users")
+          .select("role")
+          .eq("id", session.user.id)
+          .single();
+
+        if (userError || !userData || userData.role !== "SUPER_ADMIN") {
+          console.error("[AdminPanel] User fetch error or not SUPER_ADMIN:", userError?.message);
+          router.push("/auth/signin");
+          return;
+        }
+      } else {
+        router.push("/auth/signin");
+      }
+    };
+
+    fetchSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, newSession) => {
+      console.log("[AdminPanel] Auth state changed:", event);
+      setSession(newSession);
+      if (!newSession) {
+        router.push("/auth/signin");
+      } else {
+        const { data: userData, error: userError } = await supabase
+          .from("users")
+          .select("role")
+          .eq("id", newSession.user.id)
+          .single();
+
+        if (userError || !userData || userData.role !== "SUPER_ADMIN") {
+          console.error("[AdminPanel] User fetch error or not SUPER_ADMIN:", userError?.message);
+          router.push("/auth/signin");
+        }
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [router]);
+
+  const fetchTenants = useCallback(
+    async (isInitialFetch = false) => {
+      try {
+        if (isInitialFetch) setInitialLoading(true);
+        
+
+        if (tenantError) {
+          console.error("[fetchTenants] Tenant fetch error:", tenantError);
+          throw new Error(`Failed to fetch tenants: ${tenantError.message} (code: ${tenantError.code})`);
+        }
+
+        if (!tenantData || tenantData.length === 0) {
+          setTenants([]);
+          console.log("[fetchTenants] No tenants found");
+          return;
+        }
+
+        const tenantIds = tenantData.map((t) => t.id);
+        const { data: configData, error: configError } = await supabase
+          .from("tenant_configs")
+          .select("tenant_id, modules")
+          .in("tenant_id", tenantIds);
+
+        if (configError) {
+          console.error("[fetchTenants] Config fetch error:", configError);
+          throw new Error(`Failed to fetch tenant configs: ${configError.message} (code: ${configError.code})`);
+        }
+
+        const formattedTenants = tenantData.map((t) => {
+          const config = configData?.find((c) => c.tenant_id === t.id);
+          return {
+            id: t.id,
+            name: t.name,
+            subdomain: t.subdomain,
+            deletedAt: t.deletedAt,
+            config: config ? { modules: config.modules } : { modules: {} },
+          };
+        });
+
+        setTenants(formattedTenants);
+        console.log("[fetchTenants] Tenants fetched successfully:", formattedTenants);
+      } catch (err) {
+        const errorMsg = err instanceof Error ? err.message : "An unexpected error occurred while fetching tenants";
+        console.error("[fetchTenants] Error:", err);
+        setErrorMessage(errorMsg);
+        toast.error(errorMsg);
+      } finally {
+        if (isInitialFetch) setInitialLoading(false);
+      }
+    },
+    []
+  );
+
+  useEffect(() => {
+    if (!isMounted.current && session && session.user) {
+      fetchTenants(true);
       isMounted.current = true;
     }
-  }, [session, status, fetchTenants]);
+  }, [session, fetchTenants]);
 
   const handleCreateTenant = useCallback(
     async (e: React.FormEvent) => {
@@ -64,23 +169,37 @@ export default function AdminPanel() {
       setActionLoading(true);
       setActionType("create");
       try {
-        const res = await fetch("/api/tenants", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(newTenant),
-        });
-        if (!res.ok) throw new Error(`Failed to create tenant: ${await res.text()}`);
+        const { data: tenant, error: tenantError } = await supabase
+          .from("tenants")
+          .insert({ name: newTenant.name, subdomain: newTenant.subdomain })
+          .select()
+          .single();
+        if (tenantError) {
+          console.error("[handleCreateTenant] Tenant creation error:", tenantError);
+          throw new Error(`Failed to create tenant: ${tenantError.message} (code: ${tenantError.code})`);
+        }
+
+        const { error: configError } = await supabase
+          .from("tenant_configs")
+          .insert({ tenant_id: tenant.id, modules: newTenant.modules });
+        if (configError) {
+          console.error("[handleCreateTenant] Config creation error:", configError);
+          throw new Error(`Failed to create tenant config: ${configError.message} (code: ${configError.code})`);
+        }
+
         setNewTenant({ name: "", subdomain: "", modules: ALL_MODULES.reduce((acc, m) => ({ ...acc, [m]: false }), {} as ModuleConfig) });
         await fetchTenants();
         toast.success("Tenant created successfully");
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : "Could not create tenant");
+        const errorMsg = err instanceof Error ? err.message : "An unexpected error occurred while creating tenant";
+        console.error("[handleCreateTenant] Error:", err);
+        toast.error(errorMsg);
       } finally {
         setActionLoading(false);
         setActionType(null);
       }
     },
-    [newTenant, fetchTenants, actionLoading]
+    [newTenant, actionLoading, fetchTenants]
   );
 
   const handleSoftDeleteTenant = useCallback(
@@ -90,19 +209,20 @@ export default function AdminPanel() {
       setActionType("softDelete");
       setTargetId(id);
       try {
-        const res = await fetch(`/api/tenants/${id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Action": "softDeleteTenant",
-          },
-          body: JSON.stringify({}),
-        });
-        if (!res.ok) throw new Error(`Failed to soft delete tenant: ${await res.text()}`);
+        const { error } = await supabase
+          .from("tenants")
+          .update({ deletedAt: new Date().toISOString() })
+          .eq("id", id);
+        if (error) {
+          console.error("[handleSoftDeleteTenant] Error:", error);
+          throw new Error(`Failed to soft delete tenant: ${error.message} (code: ${error.code})`);
+        }
         await fetchTenants();
         toast.success(`Tenant ${id} soft deleted successfully`);
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : "Could not soft delete tenant");
+        const errorMsg = err instanceof Error ? err.message : "An unexpected error occurred while soft deleting tenant";
+        console.error("[handleSoftDeleteTenant] Error:", err);
+        toast.error(errorMsg);
       } finally {
         setActionLoading(false);
         setActionType(null);
@@ -119,23 +239,20 @@ export default function AdminPanel() {
       setActionType("restore");
       setTargetId(id);
       try {
-        const res = await fetch(`/api/tenants/${id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Action": "restoreTenant",
-          },
-          body: JSON.stringify({}),
-        });
-        if (!res.ok) {
-          const errorText = await res.text();
-          console.error("Restore failed:", errorText);
-          throw new Error(`Failed to restore tenant: ${errorText}`);
+        const { error } = await supabase
+          .from("tenants")
+          .update({ deletedAt: null })
+          .eq("id", id);
+        if (error) {
+          console.error("[handleRestoreTenant] Error:", error);
+          throw new Error(`Failed to restore tenant: ${error.message} (code: ${error.code})`);
         }
         await fetchTenants();
         toast.success("Tenant restored");
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : "Could not restore tenant");
+        const errorMsg = err instanceof Error ? err.message : "An unexpected error occurred while restoring tenant";
+        console.error("[handleRestoreTenant] Error:", err);
+        toast.error(errorMsg);
       } finally {
         setActionLoading(false);
         setActionType(null);
@@ -152,20 +269,20 @@ export default function AdminPanel() {
       setActionType(`updateModule-${module}`);
       setTargetId(tenant.id);
       try {
-        const updatedModules = { ...tenant.config?.modules, [module]: enabled };
-        const res = await fetch(`/api/tenants/${tenant.id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Action": "updateTenant",
-          },
-          body: JSON.stringify({ modules: updatedModules }),
-        });
-        if (!res.ok) throw new Error(`Failed to update tenant modules: ${await res.text()}`);
+        const updatedModules = { ...(tenant.config?.modules || {}), [module]: enabled };
+        const { error } = await supabase
+          .from("tenant_configs")
+          .upsert({ tenant_id: tenant.id, modules: updatedModules }, { onConflict: "tenant_id" });
+        if (error) {
+          console.error("[handleUpdateModules] Error:", error);
+          throw new Error(`Failed to update modules: ${error.message} (code: ${error.code})`);
+        }
         await fetchTenants();
         toast.success("Tenant modules updated");
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : "Could not update tenant modules");
+        const errorMsg = err instanceof Error ? err.message : "An unexpected error occurred while updating tenant modules";
+        console.error("[handleUpdateModules] Error:", err);
+        toast.error(errorMsg);
       } finally {
         setActionLoading(false);
         setActionType(null);
@@ -182,14 +299,30 @@ export default function AdminPanel() {
       setActionType("hardDelete");
       setTargetId(id);
       try {
-        const res = await fetch(`/api/tenants/${id}`, {
-          method: "DELETE",
-        });
-        if (!res.ok) throw new Error(`Failed to permanently delete tenant: ${await res.text()}`);
+        const { error: configError } = await supabase
+          .from("tenant_configs")
+          .delete()
+          .eq("tenant_id", id);
+        if (configError) {
+          console.error("[handleHardDeleteTenant] Config delete error:", configError);
+          throw new Error(`Failed to delete tenant config: ${configError.message} (code: ${configError.code})`);
+        }
+
+        const { error: tenantError } = await supabase
+          .from("tenants")
+          .delete()
+          .eq("id", id);
+        if (tenantError) {
+          console.error("[handleHardDeleteTenant] Tenant delete error:", tenantError);
+          throw new Error(`Failed to delete tenant: ${tenantError.message} (code: ${tenantError.code})`);
+        }
+
         await fetchTenants();
         toast.success("Tenant permanently deleted");
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : "Could not permanently delete tenant");
+        const errorMsg = err instanceof Error ? err.message : "An unexpected error occurred while permanently deleting tenant";
+        console.error("[handleHardDeleteTenant] Error:", err);
+        toast.error(errorMsg);
       } finally {
         setActionLoading(false);
         setActionType(null);
@@ -200,7 +333,7 @@ export default function AdminPanel() {
   );
 
   const handleViewDashboard = useCallback((subdomain: string) => {
-    window.open("/" + subdomain, "_blank"); // Open in new tab to avoid leaving /admin
+    window.open("/" + subdomain, "_blank");
   }, []);
 
   const formatDeletedAt = (deletedAt: string | null) => {
@@ -208,16 +341,11 @@ export default function AdminPanel() {
     return new Date(deletedAt).toISOString().split("T")[0] + " " + new Date(deletedAt).toISOString().split("T")[1].split(".")[0];
   };
 
-  if (status === "loading" || initialLoading) {
+  if (initialLoading || !session) {
     return <div className="p-6">Loading...</div>;
   }
 
-  if (status === "unauthenticated" || session?.user?.role !== "SUPER_ADMIN") {
-    router.push("/auth/signin");
-    return null;
-  }
-
-  if (error) return <div className="p-6 text-red-500">{error}</div>;
+  if (errorMessage) return <div className="p-6 text-red-500">{errorMessage}</div>;
 
   return (
     <div className="p-6 max-w-7xl mx-auto">

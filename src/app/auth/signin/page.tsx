@@ -1,52 +1,67 @@
 "use client";
-import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import 
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("[SignIn] Attempting sign-in with:", { email, password });
-    const result = await signIn("credentials", {
-      redirect: false,
-      email,
-      password,
+    setLoading(true);
+    setError(null);
+
+    const res = await fetch("/api/auth/signin", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
     });
-    console.log("[SignIn] Result:", result);
-    if (result?.error) {
-      setError("Invalid credentials");
-    } else {
-      router.push("/admin");
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      setError(data.error || "Login failed");
+      setLoading(false);
+      return;
     }
+
+    router.push("/admin");
   };
 
   return (
     <div className="p-6 max-w-md mx-auto">
-      <h1 className="text-2xl mb-4">Sign In</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <Input
+      <h1 className="text-2xl font-bold mb-4">Sign In</h1>
+      <form onSubmit={handleSignIn} className="space-y-4">
+        <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Email"
+          className="w-full p-2 border rounded"
           required
+          disabled={loading}
         />
-        <Input
+        <input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
+          className="w-full p-2 border rounded"
           required
+          disabled={loading}
         />
         {error && <p className="text-red-500">{error}</p>}
-        <Button type="submit">Sign In</Button>
+        <button
+          type="submit"
+          className="w-full p-2 bg-blue-500 text-white rounded"
+          disabled={loading}
+        >
+          {loading ? "Signing In..." : "Sign In"}
+        </button>
       </form>
     </div>
   );

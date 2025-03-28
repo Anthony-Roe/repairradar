@@ -1,5 +1,4 @@
-// File: E:\Dev\websites\repairradar\src\shared\modules\moduleManager.ts
-import { moduleImports as o } from "./moduleImports.generated";
+import { moduleImports } from './moduleImports.generated';
 
 export class ModuleManager {
   static getActiveModules(t) {
@@ -9,16 +8,16 @@ export class ModuleManager {
     }
     console.log("Config with modules:", t);
     return Object.keys(t.modules)
-      .filter((e) => o[e]) // Only include modules that exist in moduleImports
+      .filter((e) => t.modules[e] && moduleImports[e]) // Fixed: use moduleImports instead of o
       .map((e) => ({
         name: e,
-        component: o[e],
+        component: moduleImports[e],
         apiRoute: `/api/${e}`,
       }));
   }
 
   static getAllModules() {
-    console.log(Object.keys(o));
-    return Object.keys(o);
+    console.log(Object.keys(moduleImports));
+    return Object.keys(moduleImports);
   }
 }

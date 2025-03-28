@@ -1,7 +1,4 @@
-import { getServerSession } from "next-auth/next";
-import SessionWrapper from "@/components/SessionWrapper";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import ThemeWrapper from "@/components/ThemeWrapper"; // Import from sonner
+import ThemeWrapper from "@/components/ThemeWrapper";
 import "./globals.css";
 
 export const metadata = {
@@ -10,16 +7,12 @@ export const metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const session = await getServerSession(authOptions);
-  console.log("[RootLayout] Session:", session);
   return (
     <html lang="en" className="dark" style={{ colorScheme: "dark" }}>
       <body>
-          <SessionWrapper session={session}>
-            <ThemeWrapper>
-              <main>{children}</main>
-            </ThemeWrapper>
-          </SessionWrapper>
+        <ThemeWrapper>
+          <main>{children}</main>
+        </ThemeWrapper>
       </body>
     </html>
   );

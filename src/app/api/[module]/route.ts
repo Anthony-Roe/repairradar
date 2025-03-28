@@ -1,233 +1,244 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/shared/lib/db";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "../auth/[...nextauth]/route";
-import { ModuleManager } from "@/shared/modules/moduleManager";
-import { TenantConfig } from "@/shared/modules/types";
+import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '../auth/[...nextauth]/route';
+import { createClient } from '@/lib/supabase-server';
+const supabase = createClient();
+export const dynamic = "force-dynamic";
 
 const moduleConfig: Record<
   string,
   {
-    model: any;
+    table: string;
     metrics?: (items: any[]) => Record<string, number>;
-    include?: any;
-    orderBy?: any;
+    relations?: string[];
+    orderBy?: { column: string; direction: 'asc' | 'desc' };
     createTransform?: (data: any, session: any) => any;
   }
 > = {
   assets: {
-    model: prisma.asset,
+    table: 'assets',
     metrics: (items) => ({
       total: items.length,
-      active: items.filter((item) => !item.deletedAt).length,
+      active: items.filter((item) => !item.deleted_at).length,
     }),
-    orderBy: { name: "asc" },
+    orderBy: { column: 'name', direction: 'asc' },
     createTransform: (data, session) => ({
       name: data.name,
       location: data.location || null,
-      tenantId: data.tenantId,
+      tenant_id: data.tenantId,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     }),
   },
   calls: {
-    model: prisma.call,
+    table: 'calls',
     metrics: (items) => ({
       total: items.length,
       open: items.filter((item) => item.status === "OPEN").length,
     }),
-    include: { asset: true, reportedBy: { select: { id: true, email: true } } },
-    orderBy: { callTime: "desc" },
+    relations: ['assets(*)', 'users!reported_by_id(id,email)'],
+    orderBy: { column: 'call_time', direction: 'desc' },
     createTransform: (data, session) => ({
       issue: data.issue,
-      status: "OPEN",
-      tenantId: data.tenantId,
-      assetId: data.assetId,
-      reportedById: session.user.id,
-      callTime: new Date(),
+      status: 'OPEN',
+      tenant_id: data.tenantId,
+      asset_id: data.assetId,
+      reported_by_id: session.user.id,
+      call_time: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     }),
   },
   "work-orders": {
-    model: prisma.workOrder,
+    table: 'work_orders',
     metrics: (items) => ({
       total: items.length,
       active: items.filter((item) => item.status === "IN_PROGRESS" || item.status === "PENDING").length,
     }),
-    include: { assets: { include: { asset: true } }, notes: true, assignedTo: { select: { id: true, email: true } } },
-    orderBy: { createdAt: "desc" },
+    relations: ['work_order_assets(asset_id,asset:assets(*))', 'work_order_notes(*)', 'users!assigned_to_id(id,email)'],
+    orderBy: { column: 'created_at', direction: 'desc' },
     createTransform: (data, session) => ({
       description: data.description,
-      status: "PENDING",
-      tenantId: data.tenantId,
-      priority: data.priority || "MEDIUM",
-      dueDate: data.dueDate ? new Date(data.dueDate) : null,
-      assignedToId: data.assignedToId || null,
-      assets: { create: data.assetIds.map((assetId: string) => ({ assetId })) },
-      notes: data.notes ? { create: data.notes.map((note: string) => ({ note, createdById: session.user.id })) } : undefined,
+      status: 'PENDING',
+      tenant_id: data.tenantId,
+      priority: data.priority || 'MEDIUM',
+      due_date: data.dueDate || null,
+      assigned_to_id: data.assignedToId || null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     }),
   },
   "preventative-maintenance": {
-    model: prisma.maintenanceSchedule,
+    table: 'maintenance_schedules',
     metrics: (items) => ({
       total: items.length,
       scheduled: items.filter((item) => item.status === "SCHEDULED").length,
+      overdue: items.filter((item) => item.status === "OVERDUE").length,
     }),
-    include: { assets: { include: { asset: true } }, assignedTo: { select: { id: true, email: true } } },
-    orderBy: { nextRun: "asc" },
-    createTransform: (data) => ({
+    relations: ['maintenance_schedule_assets(asset_id,asset:assets(*))', 'users!assigned_to_id(id,email)'],
+    orderBy: { column: 'next_run', direction: 'asc' },
+    createTransform: (data, session) => ({
       description: data.description,
       recurrence: data.recurrence,
-      nextRun: new Date(data.nextRun),
-      lastRun: data.lastRun ? new Date(data.lastRun) : null,
-      status: data.status || "SCHEDULED",
-      priority: data.priority || "MEDIUM",
-      assignedToId: data.assignedToId || null,
-      tenantId: data.tenantId,
-      assets: { create: data.assetIds.map((assetId: string) => ({ assetId })) },
+      next_run: data.nextRun,
+      last_run: data.lastRun || null,
+      status: data.status || 'SCHEDULED',
+      priority: data.priority || 'MEDIUM',
+      assigned_to_id: data.assignedToId || null,
+      tenant_id: data.tenantId,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     }),
   },
-  inventory: {
-    model: prisma.part,
-    metrics: (items) => ({
-      total: items.length,
-      lowStock: items.filter((item) => item.quantity < item.minStock).length,
-      active: items.filter((item) => !item.deletedAt).length,
-    }),
-    include: { vendors: { include: { vendor: true } } },
-    orderBy: { name: "asc" },
-    createTransform: (data) => ({
-      name: data.name,
-      description: data.description || null,
-      quantity: parseInt(data.quantity) || 0,
-      minStock: parseInt(data.minStock) || 0,
-      tenantId: data.tenantId,
-      vendors: data.vendorIds ? { create: data.vendorIds.map((vendorId: string) => ({ vendorId })) } : undefined,
-    }),
-  },
-  vendors: {
-    model: prisma.vendor,
-    metrics: (items) => ({
-      total: items.length,
-      active: items.filter((item) => !item.deletedAt).length,
-    }),
-    orderBy: { name: "asc" },
-    createTransform: (data) => ({
-      name: data.name,
-      contact: data.contact || null,
-      email: data.email || null,
-      tenantId: data.tenantId,
-    }),
-  },
-  dashboard: { model: null },
 };
 
-async function handleRequest(req: NextRequest, method: string, module: string) {
+export async function GET(request: NextRequest, { params }: { params: { module: string } }) {
   const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const url = new URL(req.url);
-  const subdomain = url.searchParams.get("subdomain");
-  const id = url.searchParams.get("id");
+  const { module } = params;
   const config = moduleConfig[module];
+  if (!config) return NextResponse.json({ error: 'Module not found' }, { status: 404 });
 
-  if (!config) return NextResponse.json({ error: `Invalid module: ${module}` }, { status: 404 });
+  const searchParams = request.nextUrl.searchParams;
+  const id = searchParams.get('id');
+  const tenant = searchParams.get('subdomain') || session.user.tenantId;
 
-  if (!subdomain) return NextResponse.json({ error: "Subdomain is required" }, { status: 400 });
-  const tenant = await prisma.tenants.findUnique({
-    where: { subdomain, deletedAt: null },
-    include: { config: true },
-  });
-  if (!tenant) return NextResponse.json({ error: `Tenant not found: ${subdomain}` }, { status: 404 });
-
-  const isAdmin = session.user.role === "ADMIN" || session.user.role === "SUPER_ADMIN";
-  if (method !== "GET" && !isAdmin) {
-    return NextResponse.json({ error: "Unauthorized: Admin access required" }, { status: 401 });
+  let query = supabase.from(config.table).select('*');
+  
+  // Add relations if specified
+  if (config.relations) {
+    query = supabase.from(config.table).select(`*, ${config.relations.join(',')}`);
+  }
+  
+  // Filter by tenant
+  query = query.eq('tenant_id', tenant);
+  
+  // Filter by ID if provided
+  if (id) {
+    query = query.eq('id', id);
+  } else if (config.orderBy) {
+    query = query.order(config.orderBy.column, { ascending: config.orderBy.direction === 'asc' });
   }
 
-  const model = config.model;
-  const include = config.include || {};
-  const orderBy = config.orderBy || { createdAt: "desc" };
+  const { data, error } = await query;
+  
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  
+  const metrics = config.metrics ? config.metrics(data || []) : undefined;
+  
+  return NextResponse.json({ data: id ? data[0] : data, metrics });
+}
 
-  try {
-    switch (method) {
-      case "GET":
-        const items = await model.findMany({
-          where: { tenantId: tenant.id, deletedAt: null },
-          include,
-          orderBy,
-        });
-        return NextResponse.json(items);
+export async function POST(request: NextRequest, { params }: { params: { module: string } }) {
+  const session = await getServerSession(authOptions);
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-      case "POST":
-        const createData = await req.json();
-        if (!createData.subdomain || createData.subdomain !== subdomain) {
-          return NextResponse.json({ error: "Subdomain mismatch" }, { status: 400 });
-        }
-        const transformedData = config.createTransform
-          ? config.createTransform({ ...createData, tenantId: tenant.id }, session)
-          : { ...createData, tenantId: tenant.id };
-        const newItem = await model.create({
-          data: transformedData,
-          include,
-        });
-        return NextResponse.json(newItem, { status: 201 });
+  const { module } = params;
+  const config = moduleConfig[module];
+  if (!config) return NextResponse.json({ error: 'Module not found' }, { status: 404 });
 
-      case "PUT":
-        if (!id) return NextResponse.json({ error: "Missing ID" }, { status: 400 });
-        const action = req.headers.get("X-Action");
-        const updateData = await req.json();
+  const searchParams = request.nextUrl.searchParams;
+  const id = searchParams.get('id');
+  const action = request.headers.get('X-Action');
+  
+  const body = await request.json();
+  const tenant = body.subdomain || session.user.tenantId;
 
-        if (action === "delete") {
-          const deletedItem = await model.update({
-            where: { id, tenantId: tenant.id, deletedAt: null },
-            data: { deletedAt: new Date() },
-            include,
-          });
-          return NextResponse.json(deletedItem);
-        } else if (action === "restore") {
-          const restoredItem = await model.update({
-            where: { id, tenantId: tenant.id },
-            data: { deletedAt: null },
-            include,
-          });
-          return NextResponse.json(restoredItem);
-        } else {
-          // Filter out 'subdomain' from updateData
-          const { subdomain: _, ...filteredUpdateData } = updateData;
-          const updatedItem = await model.update({
-            where: { id, tenantId: tenant.id, deletedAt: null },
-            data: { ...filteredUpdateData, updatedAt: new Date() },
-            include,
-          });
-          return NextResponse.json(updatedItem);
-        }
+  // Handle different actions
+  if (action === 'delete' && id) {
+    const { error } = await supabase
+      .from(config.table)
+      .update({ deleted_at: new Date().toISOString() })
+      .eq('id', id)
+      .eq('tenant_id', tenant);
+      
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ success: true });
+  }
 
-      case "DELETE":
-        if (!id) return NextResponse.json({ error: "Missing ID" }, { status: 400 });
-        await model.delete({ where: { id, tenantId: tenant.id } });
-        return NextResponse.json({ message: `${module} permanently deleted` });
-
-      default:
-        return NextResponse.json({ error: `Method ${method} not allowed` }, { status: 405 });
+  if (id) {
+    // Update operation
+    const { error } = await supabase
+      .from(config.table)
+      .update({ ...body, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .eq('tenant_id', tenant);
+      
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    
+    // Handle special cases for related records
+    if (module === 'work-orders' && body.assetIds) {
+      // First delete existing relations
+      await supabase
+        .from('work_order_assets')
+        .delete()
+        .eq('work_order_id', id);
+        
+      // Then insert new ones
+      const assetRecords = body.assetIds.map((assetId: string) => ({
+        work_order_id: id,
+        asset_id: assetId
+      }));
+      
+      await supabase.from('work_order_assets').insert(assetRecords);
     }
-  } catch (error) {
-    console.error(`[${module}] ${method} error:`, error);
-    return NextResponse.json({ error: `Failed to process ${module} request` }, { status: 500 });
+    
+    if (module === 'work-orders' && body.newNotes && body.newNotes.length > 0) {
+      const noteRecords = body.newNotes.map((note: string) => ({
+        work_order_id: id,
+        note,
+        created_by_id: session.user.id,
+        created_at: new Date().toISOString()
+      }));
+      
+      await supabase.from('work_order_notes').insert(noteRecords);
+    }
+    
+    return NextResponse.json({ success: true });
+  } else {
+    // Create operation
+    const transformedData = config.createTransform 
+      ? config.createTransform(body, session)
+      : body;
+      
+    const { data, error } = await supabase
+      .from(config.table)
+      .insert(transformedData)
+      .select();
+      
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    
+    // Handle related records for creation
+    if (module === 'work-orders' && body.assetIds && data[0].id) {
+      const assetRecords = body.assetIds.map((assetId: string) => ({
+        work_order_id: data[0].id,
+        asset_id: assetId
+      }));
+      
+      await supabase.from('work_order_assets').insert(assetRecords);
+    }
+    
+    if (module === 'preventative-maintenance' && body.assetIds && data[0].id) {
+      const assetRecords = body.assetIds.map((assetId: string) => ({
+        maintenance_schedule_id: data[0].id,
+        asset_id: assetId
+      }));
+      
+      await supabase.from('maintenance_schedule_assets').insert(assetRecords);
+    }
+    
+    if (module === 'work-orders' && body.notes && body.notes.length > 0 && data[0].id) {
+      const noteRecords = body.notes.map((note: string) => ({
+        work_order_id: data[0].id,
+        note,
+        created_by_id: session.user.id,
+        created_at: new Date().toISOString()
+      }));
+      
+      await supabase.from('work_order_notes').insert(noteRecords);
+    }
+    
+    return NextResponse.json({ data: data[0] });
   }
 }
-
-export async function GET(req: NextRequest, { params }: { params: Promise<{ module: string }> }) {
-  return handleRequest(req, "GET", (await params).module);
-}
-
-export async function POST(req: NextRequest, { params }: { params: Promise<{ module: string }> }) {
-  return handleRequest(req, "POST", (await params).module);
-}
-
-export async function PUT(req: NextRequest, { params }: { params: Promise<{ module: string }> }) {
-  return handleRequest(req, "PUT", (await params).module);
-}
-
-export async function DELETE(req: NextRequest, { params }: { params: Promise<{ module: string }> }) {
-  return handleRequest(req, "DELETE", (await params).module);
-}
-
-export const dynamic = "force-dynamic";
