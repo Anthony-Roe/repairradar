@@ -2,7 +2,6 @@
 export const moduleImports: Record<string, () => Promise<{ default: React.ComponentType<{ tenant: string }> }>> = {
   "assets": () => import("@/shared/modules/assets/components/AssetsPage"),
   "calls": () => import("@/shared/modules/calls/components/CallsPage"),
-  "dashboard": () => import("@/shared/modules/dashboard/components/DashboardPage"),
   "inventory": () => import("@/shared/modules/inventory/components/InventoryPage"),
   "preventative-maintenance": () => import("@/shared/modules/preventative-maintenance/components/PreventativeMaintenancePage"),
   "work-orders": () => import("@/shared/modules/work-orders/components/WorkOrdersPage"),

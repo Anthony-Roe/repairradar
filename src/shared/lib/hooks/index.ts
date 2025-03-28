@@ -97,10 +97,10 @@ export function useTenantData<T>(
 }
 
 // Dedicated hook for tenant config (not an array)
-export function useTenantConfig(tenant: string, options: SWRConfiguration = {}) {
-  return useTenantData<TenantConfig>(`tenants`, tenant, {
-    ...options,
-    onSuccess: (data) => data?.modules && JSON.parse(data.modules), // Parse modules if stringified
+export function useTenantConfig(t, n = {}) {
+  return useTenantData("tenants", t, {
+    ...n,
+    onSuccess: (r) => (r?.config ? r.config : null), // Ensure config is returned or null
   });
 }
 

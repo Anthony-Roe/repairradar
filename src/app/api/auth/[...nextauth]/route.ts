@@ -3,7 +3,7 @@ import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/shared/lib/db"; 
 
-export const authOptions: NextAuthOptions = {
+export const authOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -13,20 +13,17 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
-        });
-        if (user && user.password === credentials.password) {
-          return { id: user.id, email: user.email, tenantId: user.tenantId, role: user.role };
-        }
-        return null;
+        const user = await prisma.user.findUnique({ where: { email: credentials.email } });
+        return user && user.password === credentials.password
+          ? { id: user.id, email: user.email, tenantId: user.tenantId, role: user.role }
+          : null;
       },
     }),
   ],
-  session: { strategy: "jwt" as const }, // Explicitly type as SessionStrategy
+  session: { strategy: "jwt" },
   pages: { signIn: "/auth/signin" },
   callbacks: {
-    async jwt({ token, user }: { token: JWT; user?: User }) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.tenantId = user.tenantId;
@@ -34,12 +31,13 @@ export const authOptions: NextAuthOptions = {
       }
       return token;
     },
-    async session({ session, token }: { session: Session; token: JWT }) {
-      session.user.id = token.id as string;
-      session.user.tenantId = token.tenantId as string | null;
-      session.user.role = token.role as string | null;
+    async session({ session, token }) {
+      session.user.id = token.id;
+      session.user.tenantId = token.tenantId;
+      session.user.role = token.role;
       return session;
-    },  },
+    },
+  },
 };
 
 const handler = NextAuth(authOptions);

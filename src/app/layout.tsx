@@ -13,7 +13,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const session = await getServerSession(authOptions);
   console.log("[RootLayout] Session:", session);
   return (
-    <html lang="en">
+    <html lang="en" className="dark" style={{ colorScheme: "dark" }}>
       <body>
           <SessionWrapper session={session}>
             <ThemeWrapper>

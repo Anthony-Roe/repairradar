@@ -1,37 +1,36 @@
-export const runtime = "nodejs";
+// File: E:\Dev\websites\repairradar\src\middleware.ts
+import { NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
 
-import { NextRequest, NextResponse } from "next/server";
+export async function middleware(request) {
+  const { pathname } = request.nextUrl;
 
-export async function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl;
-
-  console.log("[Middleware] Requested path:", pathname);
- 
+  // Skip middleware for static files, auth routes, and favicon
   if (
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api/auth") ||
     pathname === "/auth/signin" ||
     pathname === "/favicon.ico"
   ) {
-    console.log("[Middleware] Bypassing for:", pathname);
     return NextResponse.next();
   }
 
-  const authCookie = req.cookies.get("next-auth.session-token");
-  console.log("[Middleware] Auth cookie:", authCookie ? "exists" : "not found");
+  // Get the session token using next-auth/jwt
+  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
 
-  if (!authCookie) {
-    if (pathname.startsWith("/api/")) {
-      console.log("[Middleware] No auth cookie for API, returning unauthorized");
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    } else {
-      console.log("[Middleware] No auth cookie found, redirecting to /auth/signin");
-      return NextResponse.redirect(new URL("/auth/signin", req.url));
-    }
+  // If token exists, user is authenticated; proceed
+  if (token) {
+    return NextResponse.next();
   }
 
-  console.log("[Middleware] User authenticated, proceeding to:", pathname);
-  return NextResponse.next();
+  // No token: handle API routes vs. page routes
+  if (pathname.startsWith("/api/")) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  // Redirect to sign-in for protected pages
+  const signInUrl = new URL("/auth/signin", request.url);
+  return NextResponse.redirect(signInUrl);
 }
 
 export const config = {

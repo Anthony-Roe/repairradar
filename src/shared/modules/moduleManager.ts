@@ -1,26 +1,24 @@
-// src/shared/modules/moduleManager.ts
-import { moduleImports } from "./moduleImports.generated";
-import { TenantConfig } from "./types";
-
-export interface RawModule {
-  name: string;
-  component: () => Promise<{ default: React.ComponentType<{ tenant: string }> }>;
-  apiRoute: string;
-}
+// File: E:\Dev\websites\repairradar\src\shared\modules\moduleManager.ts
+import { moduleImports as o } from "./moduleImports.generated";
 
 export class ModuleManager {
-  static getActiveModules(config: TenantConfig | undefined): RawModule[] {
-    if (!config) return [];
-    return Object.keys(config.modules)
-      .filter((key) => key && moduleImports[key])
-      .map((key) => ({
-        name: key,
-        component: moduleImports[key],
-        apiRoute: `/api/${key}`,
+  static getActiveModules(t) {
+    if (!t || !t.modules || typeof t.modules !== "object") {
+      console.warn("Invalid config or missing modules:", t);
+      return [];
+    }
+    console.log("Config with modules:", t);
+    return Object.keys(t.modules)
+      .filter((e) => o[e]) // Only include modules that exist in moduleImports
+      .map((e) => ({
+        name: e,
+        component: o[e],
+        apiRoute: `/api/${e}`,
       }));
   }
 
-  static getAllModules(): string[] {
-    return Object.keys(moduleImports);
+  static getAllModules() {
+    console.log(Object.keys(o));
+    return Object.keys(o);
   }
 }

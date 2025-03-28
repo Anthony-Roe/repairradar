@@ -11,102 +11,102 @@ model Tenants {
   id                  String                @id @default(uuid())
   name                String
   subdomain           String                @unique
-  parentId            String? // Hierarchical support with index for performance
-  parent              Tenants?              @relation("TenantsTree", fields: [parentId], references: [id], onDelete: SetNull)
-  children            Tenants[]             @relation("TenantsTree")
-  users               User[]
-  assets              Asset[]
-  calls               Call[]
-  workOrders          WorkOrder[]
-  config              TenantConfig?
+  parentId            String?
   createdAt           DateTime              @default(now())
   updatedAt           DateTime              @updatedAt
-  deletedAt           DateTime? // Soft delete field
+  deletedAt           DateTime?
+  assets              Asset[]
+  calls               Call[]
   MaintenanceSchedule MaintenanceSchedule[]
-  parts               Part[] // Added for Part relation
-  vendors             Vendor[] // Added for Vendor relation
+  parts               Part[]
+  config              TenantConfig?
+  parent              Tenants?              @relation("TenantsTree", fields: [parentId], references: [id])
+  children            Tenants[]             @relation("TenantsTree")
+  users               User[]
+  vendors             Vendor[]
+  workOrders          WorkOrder[]
 
-  @@index([parentId]) // Define index on parentId
+  @@index([parentId])
 }
 
 model TenantConfig {
   id        String    @id @default(uuid())
   tenantId  String    @unique
-  tenant    Tenants   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  modules   Json // e.g., { "calls": true, "assets": true, "work-orders": true }
+  modules   Json
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  deletedAt DateTime? // Soft delete field
+  deletedAt DateTime?
+  tenant    Tenants   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 }
 
 model User {
   id                  String                @id @default(uuid())
   tenantId            String?
-  tenant              Tenants?              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   email               String                @unique
   password            String
-  role                UserRole              @default(USER)
-  calls               Call[] // Calls reported by the user
-  workOrders          WorkOrder[] // Work orders assigned to the user
-  notes               WorkOrderNote[] // Notes created by the user
   createdAt           DateTime              @default(now())
+  deletedAt           DateTime?
   updatedAt           DateTime              @updatedAt
-  deletedAt           DateTime? // Soft delete field
+  role                UserRole              @default(USER)
+  calls               Call[]
   MaintenanceSchedule MaintenanceSchedule[]
+  tenant              Tenants?              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  workOrders          WorkOrder[]
+  notes               WorkOrderNote[]
 }
 
 model Asset {
   id               String             @id @default(uuid())
   tenantId         String
-  tenant           Tenants            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   name             String
   location         String?
-  calls            Call[]
-  workOrders       WorkOrderAsset[] // Many-to-many relation with WorkOrder
   createdAt        DateTime           @default(now())
+  deletedAt        DateTime?
   updatedAt        DateTime           @updatedAt
-  deletedAt        DateTime? // Soft delete field
+  tenant           Tenants            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  calls            Call[]
   MaintenanceAsset MaintenanceAsset[]
+  workOrders       WorkOrderAsset[]
 }
 
 model Call {
   id           String     @id @default(uuid())
   tenantId     String
-  tenant       Tenants    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   assetId      String
-  asset        Asset      @relation(fields: [assetId], references: [id])
   reportedById String
-  reportedBy   User       @relation(fields: [reportedById], references: [id])
   issue        String
   callTime     DateTime   @default(now())
-  status       CallStatus @default(OPEN)
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
-  deletedAt    DateTime? // Soft delete field
+  status       CallStatus @default(OPEN)
+  deletedAt    DateTime?
+  asset        Asset      @relation(fields: [assetId], references: [id])
+  reportedBy   User       @relation(fields: [reportedById], references: [id])
+  tenant       Tenants    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 }
 
 model WorkOrder {
   id           String            @id @default(uuid())
   tenantId     String
-  tenant       Tenants           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   description  String
   status       WorkOrderStatus   @default(PENDING)
-  priority     WorkOrderPriority @default(MEDIUM)
-  dueDate      DateTime?
-  assignedToId String?
-  assignedTo   User?             @relation(fields: [assignedToId], references: [id], onDelete: SetNull)
-  assets       WorkOrderAsset[] // Many-to-many relation with Asset
-  notes        WorkOrderNote[] // One-to-many relation with notes
   createdAt    DateTime          @default(now())
   updatedAt    DateTime          @updatedAt
-  deletedAt    DateTime? // Soft delete field
+  assignedToId String?
+  deletedAt    DateTime?
+  dueDate      DateTime?
+  priority     WorkOrderPriority @default(MEDIUM)
+  assignedTo   User?             @relation(fields: [assignedToId], references: [id])
+  tenant       Tenants           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  assets       WorkOrderAsset[]
+  notes        WorkOrderNote[]
 }
 
 model WorkOrderAsset {
   workOrderId String
   assetId     String
-  workOrder   WorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
   asset       Asset     @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  workOrder   WorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
 
   @@id([workOrderId, assetId])
 }
@@ -114,47 +114,17 @@ model WorkOrderAsset {
 model WorkOrderNote {
   id          String    @id @default(uuid())
   workOrderId String
-  workOrder   WorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
   note        String
   createdById String?
-  createdBy   User?     @relation(fields: [createdById], references: [id], onDelete: SetNull)
   createdAt   DateTime  @default(now())
-  deletedAt   DateTime? // Soft delete field
-}
-
-// Enum for user roles
-enum UserRole {
-  USER
-  ADMIN
-  SUPER_ADMIN
-}
-
-// Enum for call statuses
-enum CallStatus {
-  OPEN
-  IN_PROGRESS
-  CLOSED
-}
-
-// Enum for work order statuses
-enum WorkOrderStatus {
-  PENDING
-  IN_PROGRESS
-  COMPLETED
-  CANCELLED
-}
-
-// Enum for work order priorities
-enum WorkOrderPriority {
-  LOW
-  MEDIUM
-  HIGH
+  deletedAt   DateTime?
+  createdBy   User?     @relation(fields: [createdById], references: [id])
+  workOrder   WorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
 }
 
 model MaintenanceSchedule {
   id           String              @id @default(uuid())
   tenantId     String
-  tenant       Tenants             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   description  String
   recurrence   Json
   nextRun      DateTime
@@ -162,20 +132,83 @@ model MaintenanceSchedule {
   status       MaintenanceStatus   @default(SCHEDULED)
   priority     MaintenancePriority @default(MEDIUM)
   assignedToId String?
-  assignedTo   User?               @relation(fields: [assignedToId], references: [id])
-  assets       MaintenanceAsset[]
   createdAt    DateTime            @default(now())
   updatedAt    DateTime            @updatedAt
   deletedAt    DateTime?
+  assets       MaintenanceAsset[]
+  assignedTo   User?               @relation(fields: [assignedToId], references: [id])
+  tenant       Tenants             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 }
 
 model MaintenanceAsset {
   maintenanceId String
   assetId       String
-  maintenance   MaintenanceSchedule @relation(fields: [maintenanceId], references: [id], onDelete: Cascade)
   asset         Asset               @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  maintenance   MaintenanceSchedule @relation(fields: [maintenanceId], references: [id], onDelete: Cascade)
 
   @@id([maintenanceId, assetId])
+}
+
+model Part {
+  id          String       @id @default(uuid())
+  name        String
+  description String?
+  quantity    Int          @default(0)
+  minStock    Int          @default(0)
+  tenantId    String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  deletedAt   DateTime?
+  tenant      Tenants      @relation(fields: [tenantId], references: [id])
+  vendors     PartVendor[]
+}
+
+model Vendor {
+  id        String       @id @default(uuid())
+  name      String
+  contact   String?
+  email     String?
+  tenantId  String
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  deletedAt DateTime?
+  parts     PartVendor[]
+  tenant    Tenants      @relation(fields: [tenantId], references: [id])
+}
+
+model PartVendor {
+  partId   String
+  vendorId String
+  cost     Float?
+  part     Part   @relation(fields: [partId], references: [id])
+  vendor   Vendor @relation(fields: [vendorId], references: [id])
+
+  @@id([partId, vendorId])
+}
+
+enum UserRole {
+  USER
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum CallStatus {
+  OPEN
+  IN_PROGRESS
+  CLOSED
+}
+
+enum WorkOrderStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum WorkOrderPriority {
+  LOW
+  MEDIUM
+  HIGH
 }
 
 enum MaintenanceStatus {
@@ -189,41 +222,4 @@ enum MaintenancePriority {
   LOW
   MEDIUM
   HIGH
-}
-
-model Part {
-  id          String       @id @default(uuid())
-  name        String
-  description String?
-  quantity    Int          @default(0)
-  minStock    Int          @default(0)
-  tenantId    String
-  tenant      Tenants      @relation(fields: [tenantId], references: [id])
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  deletedAt   DateTime?
-  vendors     PartVendor[]
-}
-
-model Vendor {
-  id        String       @id @default(uuid())
-  name      String
-  contact   String?
-  email     String?
-  tenantId  String
-  tenant    Tenants      @relation(fields: [tenantId], references: [id])
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
-  deletedAt DateTime?
-  parts     PartVendor[]
-}
-
-model PartVendor {
-  partId   String
-  vendorId String
-  part     Part   @relation(fields: [partId], references: [id])
-  vendor   Vendor @relation(fields: [vendorId], references: [id])
-  cost     Float? // Cost per unit from this vendor
-
-  @@id([partId, vendorId])
 }

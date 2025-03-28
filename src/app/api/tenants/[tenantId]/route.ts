@@ -18,6 +18,8 @@ export async function GET(req: NextRequest, context: { params: Promise<{ tenantI
     include: { config: true },
   });
 
+  console.log("tenant", tenant);
+
   if (!tenant) return NextResponse.json({ error: "Tenant not found" }, { status: 404 });
   return NextResponse.json(tenant);
 }

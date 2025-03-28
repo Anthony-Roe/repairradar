@@ -4,31 +4,34 @@ import { prisma } from "@/shared/lib/db";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]/route";
 
-export async function GET(req: NextRequest) {
+export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
+  console.log("SESSION:", session);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { searchParams } = new URL(req.url);
+  const { searchParams } = new URL(request.url);
   const subdomain = searchParams.get("subdomain");
 
   if (subdomain) {
     const tenant = await prisma.tenants.findUnique({
       where: { subdomain, deletedAt: null },
-      include: { config: true },
+      select: { config: true },
     });
+
+    console.log("tenant", tenant);
     if (!tenant) return NextResponse.json({ error: "Tenant not found" }, { status: 404 });
-    return NextResponse.json(tenant);
+    return NextResponse.json({ config: tenant.config }); // config might be null
   }
 
-  // Fetch all tenants for SUPER_ADMIN only
   if (session.user.role !== "SUPER_ADMIN") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
+
   const tenants = await prisma.tenants.findMany({
     where: { deletedAt: null },
-    include: { config: true },
+    select: { id: true, subdomain: true, config: true, createdAt: true },
   });
-  return NextResponse.json(tenants);
+  return NextResponse.json({ tenants });
 }
 
 export async function POST(req: NextRequest) {
