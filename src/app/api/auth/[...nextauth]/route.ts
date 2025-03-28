@@ -1,7 +1,7 @@
 import NextAuth, { NextAuthOptions, Session, User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { prisma } from "@/shared/lib/db";
+import { prisma } from "@/shared/lib/db"; 
 
 export const authOptions: NextAuthOptions = {
   providers: [
