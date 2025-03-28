@@ -2,7 +2,6 @@
 "use client";
 import { ChevronRight } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils"; // Assuming you have this utility
 import { Module } from "@/shared/modules/types";
 
 interface BreadcrumbItem {
@@ -45,7 +44,7 @@ export function Breadcrumb({ tenant, items, onSelectModule }: BreadcrumbProps) {
               onClick={() => onSelectModule(item.module)}
               className="hover:text-foreground transition-colors"
             >
-              {item.label}
+              {item.label} 
             </button>
           ) : (
             <span className="text-foreground">{item.label}</span>
