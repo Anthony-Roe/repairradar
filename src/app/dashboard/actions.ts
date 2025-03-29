@@ -19,7 +19,7 @@ export async function fetchDashboardData() {
   // Fetch assets
   const { data: assets } = await supabase
     .from("assets")
-    .select("id, name, location, updated_at")
+    .select("id, name, location, updated_at, status")
     .is("deleted_at", null);
 
   // Fetch live maintenance calls
@@ -44,10 +44,12 @@ export async function fetchDashboardData() {
   // Fetch vendors (simplified join with part_vendors)
   const { data: vendors } = await supabase
     .from("vendors")
-    .select("id, name, part_vendors (cost)")
+    .select("id, name, part_vendors (cost,part_id)")
     .is("deleted_at", null);
 
-  return { assets, calls, workOrders, parts, vendors };
+
+
+  return { assets: assets || [], calls: calls || [], workOrders: workOrders || [], parts: parts || [], vendors: vendors || [] };
 }
 
 export async function endCall(callId: string, solution: string) {

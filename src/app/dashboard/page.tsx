@@ -1,14 +1,13 @@
 // dashboard ui .tsx
 import { logout } from '@/app/login/actions';
 import { getUser, fetchDashboardData } from '@/app/dashboard/actions';
-import { useState, useEffect } from 'react';
 
 // Mock types for TypeScript (adjust based on your schema)
 type Asset = { id: string; name: string; location: string; status: string };
 type Call = { id: string; asset_id: string; issue: string; call_time: string; status: string; end_time?: string; solution?: string };
 type WorkOrder = { id: string; description: string; status: string; priority: string; assigned_to_id: string };
 type Part = { id: string; name: string; quantity: number; min_stock: number };
-type Vendor = { id: string; name: string; cost: number };
+type Vendor = { id: string; name: string; part_vendors: { cost: number; part_id: string }[]; };
 
 export default async function Dashboard() {
   const tenants = await getUser();
@@ -20,7 +19,7 @@ export default async function Dashboard() {
       <div className="col-span-8 row-span-4 bg-white rounded-lg shadow p-4">
         <h2 className="text-xl font-bold mb-2">Production Floor</h2>
         <div className="h-full flex flex-wrap gap-4">
-          {assets.map((asset: Asset) => (
+          {assets && assets.map((asset: Asset) => (
             <div
               key={asset.id}
               className={`p-2 rounded-full w-16 h-16 flex items-center justify-center text-white cursor-pointer ${
@@ -59,7 +58,7 @@ export default async function Dashboard() {
               {part.quantity < part.min_stock && (
                 <select className="mt-1 w-full border">
                   {vendors.map((vendor: Vendor) => (
-                    <option key={vendor.id} value={vendor.id}>{vendor.name} - ${vendor.cost}</option>
+                    <option key={vendor.id} value={vendor.id}>{vendor.name} - ${vendor.part_vendors.toString()}</option>
                   ))}
                 </select>
               )}
