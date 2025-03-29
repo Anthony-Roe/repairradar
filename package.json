@@ -6,9 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "predev": "node scripts/generateModuleImports.js",
-    "prebuild": "node scripts/generateModuleImports.js"
+    "lint": "next lint"
   },
   "prisma": {
     "seed": "ts-node prisma\\seed.ts"
@@ -71,6 +69,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@types/cookie": "^1.0.0",
     "@types/node": "^20",
     "@types/node-schedule": "^2.1.7",
     "@types/react": "^19",

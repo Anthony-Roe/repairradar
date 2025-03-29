@@ -1,20 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '../auth/[...nextauth]/route';
-import { createClient } from '@/lib/supabase-server';
-const supabase = createClient();
-export const dynamic = "force-dynamic";
+import supabase from '@/lib/supabase';
+import { ModuleConfig } from '@/shared/modules/types';
 
-const moduleConfig: Record<
-  string,
-  {
-    table: string;
-    metrics?: (items: any[]) => Record<string, number>;
-    relations?: string[];
-    orderBy?: { column: string; direction: 'asc' | 'desc' };
-    createTransform?: (data: any, session: any) => any;
-  }
-> = {
+const moduleConfig: Record<string, ModuleConfig> = {
   assets: {
     table: 'assets',
     metrics: (items) => ({
@@ -22,7 +10,7 @@ const moduleConfig: Record<
       active: items.filter((item) => !item.deleted_at).length,
     }),
     orderBy: { column: 'name', direction: 'asc' },
-    createTransform: (data, session) => ({
+    createTransform: (data) => ({
       name: data.name,
       location: data.location || null,
       tenant_id: data.tenantId,
@@ -57,7 +45,7 @@ const moduleConfig: Record<
     }),
     relations: ['work_order_assets(asset_id,asset:assets(*))', 'work_order_notes(*)', 'users!assigned_to_id(id,email)'],
     orderBy: { column: 'created_at', direction: 'desc' },
-    createTransform: (data, session) => ({
+    createTransform: (data) => ({
       description: data.description,
       status: 'PENDING',
       tenant_id: data.tenantId,
@@ -77,7 +65,7 @@ const moduleConfig: Record<
     }),
     relations: ['maintenance_schedule_assets(asset_id,asset:assets(*))', 'users!assigned_to_id(id,email)'],
     orderBy: { column: 'next_run', direction: 'asc' },
-    createTransform: (data, session) => ({
+    createTransform: (data) => ({
       description: data.description,
       recurrence: data.recurrence,
       next_run: data.nextRun,
@@ -93,8 +81,10 @@ const moduleConfig: Record<
 };
 
 export async function GET(request: NextRequest, { params }: { params: { module: string } }) {
-  const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  // Authentication check
+  const { data: { session }, error: err } = await supabase.auth.getSession();
+  if (err || !session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const user = session.user;
 
   const { module } = params;
   const config = moduleConfig[module];
@@ -102,21 +92,17 @@ export async function GET(request: NextRequest, { params }: { params: { module: 
 
   const searchParams = request.nextUrl.searchParams;
   const id = searchParams.get('id');
-  const tenant = searchParams.get('subdomain') || session.user.tenantId;
+  const tenant = searchParams.get('subdomain') || user.user_metadata?.tenantId;
 
-  let query = supabase.from(config.table).select('*');
+  // Define query with a simpler type or let inference handle it
+  let query = config.relations 
+    ? supabase.from(config.table).select(`*, ${config.relations.join(',')}`)
+    : supabase.from(config.table).select('*');
   
-  // Add relations if specified
-  if (config.relations) {
-    query = supabase.from(config.table).select(`*, ${config.relations.join(',')}`);
-  }
-  
-  // Filter by tenant
   query = query.eq('tenant_id', tenant);
   
-  // Filter by ID if provided
   if (id) {
-    query = query.eq('id', id);
+    query = query.eq('id', id).single();
   } else if (config.orderBy) {
     query = query.order(config.orderBy.column, { ascending: config.orderBy.direction === 'asc' });
   }
@@ -124,15 +110,18 @@ export async function GET(request: NextRequest, { params }: { params: { module: 
   const { data, error } = await query;
   
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (id && !data) return NextResponse.json({ error: 'Record not found' }, { status: 404 });
+
+  const metrics = config.metrics && !id ? config.metrics(data || []) : undefined;
   
-  const metrics = config.metrics ? config.metrics(data || []) : undefined;
-  
-  return NextResponse.json({ data: id ? data[0] : data, metrics });
+  return NextResponse.json({ data: id ? data : data, metrics });
 }
 
 export async function POST(request: NextRequest, { params }: { params: { module: string } }) {
-  const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  // Authentication check
+  const { data: { session }, error: err } = await supabase.auth.getSession();
+  if (err || !session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const user = session.user;
 
   const { module } = params;
   const config = moduleConfig[module];
@@ -143,13 +132,12 @@ export async function POST(request: NextRequest, { params }: { params: { module:
   const action = request.headers.get('X-Action');
   
   const body = await request.json();
-  const tenant = body.subdomain || session.user.tenantId;
+  const tenant = body.subdomain || user.user_metadata?.tenantId;
 
-  // Handle different actions
   if (action === 'delete' && id) {
     const { error } = await supabase
       .from(config.table)
-      .update({ deleted_at: new Date().toISOString() })
+      .update({ deleted_at: new Date().toISOString(), updated_at: new Date().toISOString() })
       .eq('id', id)
       .eq('tenant_id', tenant);
       
@@ -159,86 +147,86 @@ export async function POST(request: NextRequest, { params }: { params: { module:
 
   if (id) {
     // Update operation
-    const { error } = await supabase
+    const updateData = { ...body, updated_at: new Date().toISOString() };
+    delete updateData.assetIds;
+    delete updateData.newNotes;
+
+    const { error: updateError } = await supabase
       .from(config.table)
-      .update({ ...body, updated_at: new Date().toISOString() })
+      .update(updateData)
       .eq('id', id)
       .eq('tenant_id', tenant);
       
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (updateError) return NextResponse.json({ error: updateError.message }, { status: 500 });
     
-    // Handle special cases for related records
-    if (module === 'work-orders' && body.assetIds) {
-      // First delete existing relations
-      await supabase
-        .from('work_order_assets')
-        .delete()
-        .eq('work_order_id', id);
-        
-      // Then insert new ones
-      const assetRecords = body.assetIds.map((assetId: string) => ({
-        work_order_id: id,
-        asset_id: assetId
-      }));
+    if (module === 'work-orders') {
+      if (body.assetIds) {
+        await supabase.from('work_order_assets').delete().eq('work_order_id', id);
+        const assetRecords = body.assetIds.map((assetId: string) => ({
+          work_order_id: id,
+          asset_id: assetId
+        }));
+        const { error: assetError } = await supabase.from('work_order_assets').insert(assetRecords);
+        if (assetError) return NextResponse.json({ error: assetError.message }, { status: 500 });
+      }
       
-      await supabase.from('work_order_assets').insert(assetRecords);
-    }
-    
-    if (module === 'work-orders' && body.newNotes && body.newNotes.length > 0) {
-      const noteRecords = body.newNotes.map((note: string) => ({
-        work_order_id: id,
-        note,
-        created_by_id: session.user.id,
-        created_at: new Date().toISOString()
-      }));
-      
-      await supabase.from('work_order_notes').insert(noteRecords);
+      if (body.newNotes?.length > 0) {
+        const noteRecords = body.newNotes.map((note: string) => ({
+          work_order_id: id,
+          note,
+          created_by_id: user.id,
+          created_at: new Date().toISOString()
+        }));
+        const { error: noteError } = await supabase.from('work_order_notes').insert(noteRecords);
+        if (noteError) return NextResponse.json({ error: noteError.message }, { status: 500 });
+      }
     }
     
     return NextResponse.json({ success: true });
   } else {
     // Create operation
     const transformedData = config.createTransform 
-      ? config.createTransform(body, session)
-      : body;
-      
+      ? config.createTransform(body, { user }) // Pass user instead of full session
+      : { ...body, tenant_id: tenant };
+    
     const { data, error } = await supabase
       .from(config.table)
       .insert(transformedData)
-      .select();
+      .select()
+      .single();
       
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (!data) return NextResponse.json({ error: 'Failed to create record' }, { status: 500 });
     
-    // Handle related records for creation
-    if (module === 'work-orders' && body.assetIds && data[0].id) {
+    if (module === 'work-orders' && body.assetIds) {
       const assetRecords = body.assetIds.map((assetId: string) => ({
-        work_order_id: data[0].id,
+        work_order_id: data.id,
         asset_id: assetId
       }));
-      
-      await supabase.from('work_order_assets').insert(assetRecords);
+      const { error: assetError } = await supabase.from('work_order_assets').insert(assetRecords);
+      if (assetError) return NextResponse.json({ error: assetError.message }, { status: 500 });
     }
     
-    if (module === 'preventative-maintenance' && body.assetIds && data[0].id) {
+    if (module === 'preventative-maintenance' && body.assetIds) {
       const assetRecords = body.assetIds.map((assetId: string) => ({
-        maintenance_schedule_id: data[0].id,
+        maintenance_schedule_id: data.id,
         asset_id: assetId
       }));
-      
-      await supabase.from('maintenance_schedule_assets').insert(assetRecords);
+      const { error: assetError } = await supabase.from('maintenance_schedule_assets').insert(assetRecords);
+      if (assetError) return NextResponse.json({ error: assetError.message }, { status: 500 });
     }
     
-    if (module === 'work-orders' && body.notes && body.notes.length > 0 && data[0].id) {
+    if (module === 'work-orders' && body.notes?.length > 0) {
       const noteRecords = body.notes.map((note: string) => ({
-        work_order_id: data[0].id,
+        work_order_id: data.id,
         note,
-        created_by_id: session.user.id,
+        created_by_id: user.id,
         created_at: new Date().toISOString()
       }));
-      
-      await supabase.from('work_order_notes').insert(noteRecords);
+      const { error: noteError } = await supabase.from('work_order_notes').insert(noteRecords);
+      if (noteError) return NextResponse.json({ error: noteError.message }, { status: 500 });
     }
     
-    return NextResponse.json({ data: data[0] });
+    return NextResponse.json({ data });
   }
 }

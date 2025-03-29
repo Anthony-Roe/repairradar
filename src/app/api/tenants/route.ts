@@ -1,11 +1,12 @@
 // src/app/api/tenants/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/shared/lib/db";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "../auth/[...nextauth]/route";
+import supabase from "@/lib/supabase";
+import { TenantConfig } from "@/shared/modules/types";
 
 export async function GET(request: NextRequest) {
-  const session = await getServerSession(authOptions);
+  const { data: { session }, error: err } = await supabase.auth.getSession();
+  if (err || !session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const user = session.user;
   console.log("SESSION:", session);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -13,40 +14,110 @@ export async function GET(request: NextRequest) {
   const subdomain = searchParams.get("subdomain");
 
   if (subdomain) {
-    const tenant = await prisma.tenants.findUnique({
-      where: { subdomain, deletedAt: null },
-      select: { config: true },
-    });
+    const { data: tenant, error } = await supabase
+      .from('tenants')
+      .select(`
+        id,
+        name,
+        subdomain,
+        deleted_at,
+        tenant_configs (
+          modules
+        )
+      `)
+      .eq('subdomain', subdomain)
+      .is('deleted_at', null)
+      .single();
 
-    console.log("tenant", tenant);
-    if (!tenant) return NextResponse.json({ error: "Tenant not found" }, { status: 404 });
-    return NextResponse.json({ config: tenant.config }); // config might be null
+    if (error || !tenant) return NextResponse.json({ error: "Tenant not found" }, { status: 404 });
+
+    // Format single tenant response
+    const formattedTenant: TenantConfig = {
+      tenantId: tenant.id,
+      subdomain: tenant.subdomain,
+      modules: tenant.tenant_configs ? { modules: tenant.tenant_configs.modules } : {},
+      deletedAt: tenant.deleted_at
+    };
+    
+    return NextResponse.json({ config: formattedTenant });
   }
 
-  if (session.user.role !== "SUPER_ADMIN") {
+  if (user && user.role !== "SUPER_ADMIN") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const tenants = await prisma.tenants.findMany({
-    where: { deletedAt: null },
-    select: { id: true, subdomain: true, config: true, createdAt: true },
-  });
-  return NextResponse.json({ tenants });
+  const { data: tenants, error } = await supabase
+    .from('tenants')
+    .select(`
+      id,
+      name,
+      subdomain,
+      deleted_at,
+      tenant_configs (
+        modules
+      )
+    `)
+    .is('deleted_at', null);
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  // Format the response to match the provided structure
+  const formattedTenants = tenants.map((tenant) => ({
+    tenantId: tenant.id,
+    subdomain: tenant.subdomain,
+    modules: tenant.tenant_configs ? { modules: tenant.tenant_configs.modules } : {},
+    deletedAt: tenant.deleted_at
+  } as TenantConfig));
+
+  return NextResponse.json({ tenants: formattedTenants });
 }
 
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session || session.user.role !== "SUPER_ADMIN") {
+  const { data: { session }, error: err } = await supabase.auth.getSession();
+  if (err || !session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const user = session.user;
+  if (!user || user?.role !== "SUPER_ADMIN") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  
   const { name, subdomain, modules } = await req.json();
-  const tenant = await prisma.tenants.create({
-    data: {
+
+  const { data: tenant, error: tenantError } = await supabase
+    .from('tenants')
+    .insert({ name, subdomain })
+    .select(`
+      id,
       name,
       subdomain,
-      config: { create: { modules } },
-    },
-    include: { config: true },
-  });
-  return NextResponse.json(tenant, { status: 201 });
+      deleted_at
+    `)
+    .single();
+
+  if (tenantError || !tenant) {
+    return NextResponse.json({ error: tenantError?.message || "Failed to create tenant" }, { status: 500 });
+  }
+
+  const { data: config, error: configError } = await supabase
+    .from('tenant_configs')
+    .insert({
+      tenant_id: tenant.id,
+      modules
+    })
+    .select('modules')
+    .single();
+
+  if (configError) {
+    await supabase.from('tenants').delete().eq('id', tenant.id);
+    return NextResponse.json({ error: configError.message }, { status: 500 });
+  }
+
+  // Format response following the structure
+  const formattedTenant: TenantConfig = {
+    tenantId: tenant.id,
+    subdomain: tenant.subdomain,
+    modules: config ? { modules: config.modules } : {},
+    deletedAt: tenant.deleted_at
+  };
+
+  return NextResponse.json(formattedTenant, { status: 201 });
 }

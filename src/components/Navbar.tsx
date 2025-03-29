@@ -8,8 +8,7 @@ import Link from "next/link";
 export default function Navbar({ tenant, activeModules = [] }) {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const pathname = usePathname();
-  const currentModule = pathname.split("/")[3]; // e.g., "inventory" from "/dashboard/plygem/inventory"
+  const pathname = usePathname(); // e.g., "inventory" from "/dashboard/plygem/inventory"
 
   if (status === "loading") return null;
 
