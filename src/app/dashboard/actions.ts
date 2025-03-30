@@ -1,65 +1,143 @@
-// actions.ts for dashboard
+// app/dashboard/actions.ts
 "use server";
-import { createClient } from "@/utils/supabase/server";
+import { db } from "@/lib/helper";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-export async function getUser() {
-  const supabase = await createClient();
-  const { data: tenants } = await supabase
-    .from("tenants")
-    .select(`id, name, subdomain, tenant_configs (modules), deleted_at`)
-    .is("deleted_at", null); // Filter out deleted tenants
-  return tenants;
-}
-
 export async function fetchDashboardData() {
-  const supabase = await createClient();
+  const database = await db();
+  const user = await database.auth.getUser();
+  
+  if (!user) {
+    redirect("/login");
+  }
 
-  // Fetch assets
-  const { data: assets } = await supabase
-    .from("assets")
-    .select("id, name, location, updated_at, status")
-    .is("deleted_at", null);
+  // Fetch all dashboard data in parallel
+  const [
+    assetsPromise,
+    callsPromise,
+    workOrdersPromise,
+    partsPromise,
+    vendorsPromise
+  ] = await Promise.all([
+    database.assets.getAll(user.tenantId),
+    database.calls.getAll(user.tenantId, { status: CallStatus.OPEN }),
+    database.workOrders.getAll(user.tenantId),
+    database.parts.getAll(user.tenantId),
+    database.from("vendors").select("id, name, part_vendors (cost, part_id)").is("deleted_at", null)
+  ]);
 
-  // Fetch live maintenance calls
-  const { data: calls } = await supabase
-    .from("calls")
-    .select("id, asset_id, issue, call_time, status, updated_at")
-    .is("deleted_at", null)
-    .in("status", ["open", "in_progress"]); // Active calls only
+  // Process results
+  const { data: assets } = assetsPromise;
+  const { data: calls } = callsPromise;
+  const { data: workOrders } = workOrdersPromise;
+  const { data: parts } = partsPromise;
+  const { data: vendors } = vendorsPromise;
 
-  // Fetch work orders
-  const { data: workOrders } = await supabase
-    .from("work_orders")
-    .select("id, description, status, priority, assigned_to_id, due_date")
-    .is("deleted_at", null);
-
-  // Fetch parts inventory
-  const { data: parts } = await supabase
-    .from("parts")
-    .select("id, name, quantity, min_stock")
-    .is("deleted_at", null);
-
-  // Fetch vendors (simplified join with part_vendors)
-  const { data: vendors } = await supabase
-    .from("vendors")
-    .select("id, name, part_vendors (cost,part_id)")
-    .is("deleted_at", null);
-
-
-
-  return { assets: assets || [], calls: calls || [], workOrders: workOrders || [], parts: parts || [], vendors: vendors || [] };
+  return { 
+    assets: assets || [], 
+    calls: calls || [], 
+    workOrders: workOrders || [], 
+    parts: parts || [], 
+    vendors: vendors || [] 
+  };
 }
 
 export async function endCall(callId: string, solution: string) {
-  const supabase = await createClient();
-  const { error } = await supabase
-    .from("calls")
-    .update({ status: "closed", end_time: new Date().toISOString(), solution })
-    .eq("id", callId);
-  if (!error) {
-    revalidatePath("/dashboard");
+  const database = await db();
+  
+  const { error } = await database.calls.updateStatus(
+    callId, 
+    CallStatus.CLOSED,
+    undefined, // Optional tenantId if needed
+    { solution }
+  );
+
+  if (error) {
+    console.error("Error ending call:", error);
+    return { error };
   }
-  return { error };
+
+  revalidatePath("/dashboard");
+  return { error: null };
+}
+
+export async function createWorkOrder(assetId: string, description: string) {
+  const database = await db();
+  const user = await database.auth.getUser();
+  
+  if (!user) {
+    redirect("/login");
+  }
+
+  const { data, error } = await database.workOrders.create({
+    tenantId: user.tenantId,
+    assetId,
+    description,
+    priority: WorkOrderPriority.MEDIUM,
+    assignedToId: null,
+    dueDate: null
+  });
+
+  if (error) {
+    console.error("Error creating work order:", error);
+    return { error };
+  }
+
+  revalidatePath("/dashboard");
+  return { data, error: null };
+}
+
+export async function updatePartQuantity(partId: string, newQuantity: number) {
+  const database = await db();
+  
+  const { error } = await database.parts.update(partId, {
+    quantity: newQuantity,
+    updatedAt: new Date()
+  });
+
+  if (error) {
+    console.error("Error updating part quantity:", error);
+    return { error };
+  }
+
+  revalidatePath("/dashboard");
+  return { error: null };
+}
+
+export async function assignWorkOrder(workOrderId: string, userId: string) {
+  const database = await db();
+  
+  const { error } = await database.workOrders.assign(workOrderId, userId);
+
+  if (error) {
+    console.error("Error assigning work order:", error);
+    return { error };
+  }
+
+  revalidatePath("/dashboard");
+  return { error: null };
+}
+
+export async function addWorkOrderNote(workOrderId: string, note: string) {
+  const database = await db();
+  const user = await database.auth.getUser();
+  
+  if (!user) {
+    redirect("/login");
+  }
+
+  const { error } = await database.workOrders.addNote(
+    workOrderId, 
+    note, 
+    user.id
+  );
+
+  if (error) {
+    console.error("Error adding work order note:", error);
+    return { error };
+  }
+
+  revalidatePath("/dashboard");
+  return { error: null };
 }

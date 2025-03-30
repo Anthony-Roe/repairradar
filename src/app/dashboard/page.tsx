@@ -1,6 +1,6 @@
 // dashboard ui .tsx
 import { logout } from '@/app/login/actions';
-import { getUser, fetchDashboardData } from '@/app/dashboard/actions';
+import { fetchDashboardData } from '@/app/dashboard/actions';
 
 // Mock types for TypeScript (adjust based on your schema)
 type Asset = { id: string; name: string; location: string; status: string };
@@ -10,7 +10,6 @@ type Part = { id: string; name: string; quantity: number; min_stock: number };
 type Vendor = { id: string; name: string; part_vendors: { cost: number; part_id: string }[]; };
 
 export default async function Dashboard() {
-  const tenants = await getUser();
   const { assets, calls, workOrders, parts, vendors } = await fetchDashboardData();
 
   return (
