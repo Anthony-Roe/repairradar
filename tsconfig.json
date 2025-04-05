@@ -7,22 +7,23 @@
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
-    "module": "CommonJS",
-    "moduleResolution": "node",
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
     "forceConsistentCasingInFileNames": true,
     "plugins": [{ "name": "next" }],
-    "paths": { "@/*": ["./src/*"], "@/shared/lib/hooks": ["./src/shared/lib/hooks/index.ts"], "@/components/ui": ["./src/components/ui/index.ts"] }
+    "baseUrl": "./",
+    "paths": { "@/*": ["src/*"] }
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/prisma/seed.ts", ".ai-assistant/ai.ts", "scripts/seed.ts", 
+    "src/prisma/seed.ts", ".ai-assistant/ai.ts", "scripts/seed.ts", "src/**/*.ts", 
     //"src/shared/modules/orchestrator.ts.bak"  
   ],
   "exclude": ["node_modules"]

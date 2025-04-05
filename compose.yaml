@@ -1,0 +1,22 @@
+services:
+  app:
+    build:
+      context: ./
+    init: true
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    networks:
+      - app_network
+    # env_file: ./.env.local  # Uncomment if .env.local file exists
+  scripts:
+    build:
+      context: ./scripts
+    init: true
+    restart: unless-stopped
+    networks:
+      - app_network
+    # env_file: ./scripts/.env  # Uncomment if .env file exists
+networks:
+  app_network:
+    driver: bridge

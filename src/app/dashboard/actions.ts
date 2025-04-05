@@ -1,143 +1,148 @@
 // app/dashboard/actions.ts
 "use server";
-import { db } from "@/lib/helper";
+import { Asset, CallPriority, WorkOrder, CallStatus, Incident } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import {prisma} from "@/lib/prisma";
 
+// Helper to get current user with tenant
+async function getCurrentUser() {
+  const user = await prisma.user.findUnique({
+    where: { id: "CURRENT_USER_ID" }, // Replace with your auth logic
+    include: { tenant: true }
+  });
+
+  if (!user || !user.tenant) redirect("/login");
+  return user;
+}
+
+// Dashboard Data Fetching
 export async function fetchDashboardData() {
-  const database = await db();
-  const user = await database.auth.getUser();
-  
-  if (!user) {
-    redirect("/login");
-  }
+  const user = await getCurrentUser();
 
-  // Fetch all dashboard data in parallel
   const [
-    assetsPromise,
-    callsPromise,
-    workOrdersPromise,
-    partsPromise,
-    vendorsPromise
+    assets,
+    calls,
+    workOrders,
+    parts,
+    vendors
   ] = await Promise.all([
-    database.assets.getAll(user.tenantId),
-    database.calls.getAll(user.tenantId, { status: CallStatus.OPEN }),
-    database.workOrders.getAll(user.tenantId),
-    database.parts.getAll(user.tenantId),
-    database.from("vendors").select("id, name, part_vendors (cost, part_id)").is("deleted_at", null)
+    prisma.asset.findMany({ where: { tenantId: user.tenantId } }),
+    prisma.incident.findMany({ where: { tenantId: user.tenantId } }),
+    prisma.workOrder.findMany({ where: { tenantId: user.tenantId } }),
+    prisma.part.findMany({ where: { tenantId: user.tenantId } }),
+    prisma.vendor.findMany({ where: { tenantId: user.tenantId } }),
   ]);
 
-  // Process results
-  const { data: assets } = assetsPromise;
-  const { data: calls } = callsPromise;
-  const { data: workOrders } = workOrdersPromise;
-  const { data: parts } = partsPromise;
-  const { data: vendors } = vendorsPromise;
-
   return { 
-    assets: assets || [], 
-    calls: calls || [], 
-    workOrders: workOrders || [], 
-    parts: parts || [], 
-    vendors: vendors || [] 
+    meta: user,
+    assets, 
+    calls, 
+    workOrders, 
+    parts, 
+    vendors 
   };
 }
 
-export async function endCall(callId: string, solution: string) {
-  const database = await db();
-  
-  const { error } = await database.calls.updateStatus(
-    callId, 
-    CallStatus.CLOSED,
-    undefined, // Optional tenantId if needed
-    { solution }
-  );
-
-  if (error) {
+// Call Actions
+export async function endCall(callId: string) {
+  try {
+    await prisma.incident.update({
+      where: { id: callId },
+      data: { status: CallStatus.CLOSED }
+    });
+    revalidatePath("/dashboard");
+    return { success: true };
+  } catch (error) {
     console.error("Error ending call:", error);
-    return { error };
+    return { error: "Failed to update call" };
   }
-
-  revalidatePath("/dashboard");
-  return { error: null };
 }
 
-export async function createWorkOrder(assetId: string, description: string) {
-  const database = await db();
-  const user = await database.auth.getUser();
-  
-  if (!user) {
-    redirect("/login");
+export async function createWorkOrder(
+  assetIds: string[],
+  description: string,
+  priority: CallPriority = CallPriority.LOW
+) {
+  const user = await getCurrentUser();
+
+  // Validation
+  if (!description || description.length < 10) {
+    return { error: "Description must be at least 10 characters" };
   }
 
-  const { data, error } = await database.workOrders.create({
-    tenantId: user.tenantId,
-    assetId,
-    description,
-    priority: WorkOrderPriority.MEDIUM,
-    assignedToId: null,
-    dueDate: null
-  });
+  try {
+    const workOrder = await prisma.workOrder.create({
+      data: {
+        tenantId: user.tenantId,
+        description,
+        priority,
+        assets: {
+          create: assetIds.map(assetId => ({
+            asset: { connect: { id: assetId } }
+          }))
+        }
+      },
+      include: { assets: { include: { asset: true } } }
+    });
 
-  if (error) {
+    await prisma.workOrderLog.create({
+      data: {
+        workOrderId: workOrder.id,
+        userId: user.id,
+        action: "CREATED",
+        details: { message: `Created by ${user.firstName} ${user.lastName}` }
+      }
+    });
+
+    revalidatePath("/dashboard");
+    return { 
+      data: {
+        ...workOrder,
+        assets: workOrder.assets.map(wa => wa.asset) // Flatten the response
+      } 
+    };
+  } catch (error) {
     console.error("Error creating work order:", error);
-    return { error };
+    return { error: "Failed to create work order" };
   }
-
-  revalidatePath("/dashboard");
-  return { data, error: null };
 }
 
-export async function updatePartQuantity(partId: string, newQuantity: number) {
-  const database = await db();
-  
-  const { error } = await database.parts.update(partId, {
-    quantity: newQuantity,
-    updatedAt: new Date()
-  });
+// Asset Actions
+export async function createAsset(input: { name: string; location: string }) {
+  const user = await getCurrentUser();
 
-  if (error) {
-    console.error("Error updating part quantity:", error);
-    return { error };
+  try {
+    const asset = await prisma.asset.create({
+      data: {
+        tenantId: user.tenantId,
+        ...input
+      }
+    });
+    revalidatePath("/dashboard");
+    return { data: asset };
+  } catch (error) {
+    console.error("Error creating asset:", error);
+    return { error: "Failed to create asset" };
   }
-
-  revalidatePath("/dashboard");
-  return { error: null };
 }
 
-export async function assignWorkOrder(workOrderId: string, userId: string) {
-  const database = await db();
-  
-  const { error } = await database.workOrders.assign(workOrderId, userId);
+// Call Creation
+export async function createCall(input: { assetId: string; description: string }) {
+  const user = await getCurrentUser();
 
-  if (error) {
-    console.error("Error assigning work order:", error);
-    return { error };
+  try {
+    const call = await prisma.incident.create({
+      data: {
+        tenantId: user.tenantId,
+        ...input,
+        status: CallStatus.OPEN
+      }
+    });
+    revalidatePath("/dashboard");
+    return { data: call };
+  } catch (error) {
+    console.error("Error creating call:", error);
+    return { error: "Failed to create call" };
   }
-
-  revalidatePath("/dashboard");
-  return { error: null };
-}
-
-export async function addWorkOrderNote(workOrderId: string, note: string) {
-  const database = await db();
-  const user = await database.auth.getUser();
-  
-  if (!user) {
-    redirect("/login");
-  }
-
-  const { error } = await database.workOrders.addNote(
-    workOrderId, 
-    note, 
-    user.id
-  );
-
-  if (error) {
-    console.error("Error adding work order note:", error);
-    return { error };
-  }
-
-  revalidatePath("/dashboard");
-  return { error: null };
 }

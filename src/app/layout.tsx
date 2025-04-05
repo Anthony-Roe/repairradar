@@ -1,5 +1,7 @@
-import ThemeWrapper from "@/components/ThemeWrapper";
+import { ThemeProvider } from "@/components/ThemeWrapper";
 import "./globals.css";
+import { Toaster } from "sonner";
+import Footer from "@/components/Footer";
 
 export const metadata = {
   title: "RepairRadar",
@@ -8,12 +10,22 @@ export const metadata = {
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
+    <>
     <html lang="en" className="dark" style={{ colorScheme: "dark" }}>
+      <head/>
       <body>
-        <ThemeWrapper>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
           <main>{children}</main>
-        </ThemeWrapper>
+          <Toaster/>
+          <Footer/>
+        </ThemeProvider>
       </body>
     </html>
+    </>
   );
 }

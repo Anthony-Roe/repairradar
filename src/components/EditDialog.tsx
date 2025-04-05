@@ -22,13 +22,14 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Loader2, CalendarIcon, Clock } from 'lucide-react';
 import { useState } from 'react';
 import { format } from 'date-fns';
+import { SelectMulti } from './SelectMulti';
 
 type StatusOption = {
   value: string;
   label: string;
 };
 
-type FieldType = 'text' | 'number' | 'select' | 'date' | 'time' | 'datetime';
+type FieldType = 'text' | 'number' | 'select' | 'selectmulti' | 'date' | 'time' | 'datetime';
 
 type EditDialogProps = {
   open: boolean;
@@ -71,9 +72,13 @@ export function EditDialog({
     }
   };
 
-  const handleChange = (name: string, value: string | Date) => {
+  const handleChange = (name: string, value: string | Date | string[]) => {
     // Convert Date objects to ISO strings for consistent storage
-    const formattedValue = value instanceof Date ? value.toISOString() : value;
+    const formattedValue = value instanceof Date 
+    ? value.toISOString() 
+    : Array.isArray(value)
+    ? value
+    : value;
     setFormData(prev => ({ ...prev, [name]: formattedValue }));
   };
 
@@ -103,7 +108,15 @@ export function EditDialog({
             </SelectContent>
           </Select>
         );
-
+      case 'selectmulti':
+          return (
+            <SelectMulti
+              options={field.options || []}
+              value={formData[field.name] || []}
+              onChange={(value) => handleChange(field.name, value)}
+              placeholder={`Select ${field.label.toLowerCase()}`}
+            />
+          );
       case 'date':
         return (
           <Popover>
@@ -243,7 +256,7 @@ export function EditDialog({
             </Button>
             <Button type="submit" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Save Changes
+              Submit
             </Button>
           </div>
         </form>
