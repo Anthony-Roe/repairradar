@@ -1,0 +1,14 @@
+{
+  "version": "1.1",
+  "created": 1743874237.214131,
+  "original_size": 220932,
+  "compressed_size": 112848,
+  "file_count": 65,
+  "dir_count": 13,
+  "skipped_files": 0,
+  "chunk_count": 3,
+  "chunk_size": 50000,
+  "hash_algorithm": "sha256",
+  "output_prefix": "test",
+  "compression": "zlib+base64"
+}

@@ -1,0 +1,18 @@
+{
+    "label": "Ask CodeLlama",
+    "type": "shell",
+    "command": "python ${workspaceFolder}/ask.py",
+    "args": ["${input:question}"],
+    "problemMatcher": [],
+    "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+    },
+    "inputs": [
+        {
+            "id": "question",
+            "type": "promptString",
+            "description": "Enter your question for CodeLlama"
+        }
+    ]
+}

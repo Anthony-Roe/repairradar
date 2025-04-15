@@ -3,7 +3,8 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
-import { UserRole } from "@prisma/client";
+import { Tenant, UserRole } from "@prisma/client";
+import { redirect } from "next/navigation";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -28,6 +29,9 @@ export const authOptions: NextAuthOptions = {
         const user = await prisma.user.findUnique({
           where: {
             employeeId: credentials.employeeId,
+          },
+          include: {
+            tenant: true
           }
         });
 
@@ -48,13 +52,9 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Invalid credentials");
         }
 
-        return {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          employeeId: user.employeeId,
-          tenantId: user.tenantId,
-          role: user.role,
+        
+
+        return { ...user
         };
       },
     }),
@@ -65,6 +65,7 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id;
         token.role = user.role;
         token.tenantId = user.tenantId;
+        token.tenant = user.tenant;
       }
       return token;
     },
@@ -73,6 +74,7 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id as string;
         session.user.role = token.role as UserRole;
         session.user.tenantId = token.tenantId as string;
+        session.user.tenant = token.tenant as Tenant;
       }
       return session;
     },

@@ -1,0 +1,234 @@
+﻿Folder PATH listing for volume Games
+Volume serial number is 2804-D1BA
+E:.
+ª   clipboard.txt
+ª   middleware.ts
+ª   output.txt
+ª   tree.txt
+ª   ts-exports-ai.json
+ª   ts-exports.txt
+ª   
++---actions
+ª   ª   index.ts
+ª   ª   
+ª   +---admin
+ª   ª       users.ts
+ª   ª       
+ª   +---assets
+ª   ª   ª   index.ts
+ª   ª   ª   
+ª   ª   +---__tests__
+ª   ª           index.test.ts
+ª   ª           
+ª   +---incidents
+ª   ª       index.ts
+ª   ª       
+ª   +---maintenance
+ª   ª       index.ts
+ª   ª       
+ª   +---parts
+ª   ª       index.ts
+ª   ª       
+ª   +---tenants
+ª   ª       index.ts
+ª   ª       
+ª   +---users
+ª   ª       index.ts
+ª   ª       
+ª   +---vendors
+ª   ª       index.ts
+ª   ª       
+ª   +---work-orders
+ª           index.ts
+ª           index.txt
+ª           
++---app
+ª   ª   favicon.ico
+ª   ª   globals.css
+ª   ª   layout.tsx
+ª   ª   page.tsx
+ª   ª   
+ª   +---(auth)
+ª   ª   +---login
+ª   +---(tenant)
+ª   ª   +---[tenant]
+ª   ª       ª   layout.tsx
+ª   ª       ª   page.tsx
+ª   ª       ª   
+ª   ª       +---@analytics
+ª   ª       ª       page.tsx
+ª   ª       ª       
+ª   ª       +---@dashboard
+ª   ª       ª       client.tsx
+ª   ª       ª       default.tsx
+ª   ª       ª       error.tsx
+ª   ª       ª       loading.tsx
+ª   ª       ª       page.tsx
+ª   ª       ª       
+ª   ª       +---@modal
+ª   ª       ª   ª   default.tsx
+ª   ª       ª   ª   
+ª   ª       ª   +---(.)asset
+ª   ª       ª   ª   +---[id]
+ª   ª       ª   ª           page.tsx
+ª   ª       ª   ª           
+ª   ª       ª   +---(.)incident
+ª   ª       ª   ª   +---[id]
+ª   ª       ª   ª           page.tsx
+ª   ª       ª   ª           
+ª   ª       ª   +---(.)maintenance
+ª   ª       ª   ª   +---[id]
+ª   ª       ª   ª           page.tsx
+ª   ª       ª   ª           
+ª   ª       ª   +---(.)part
+ª   ª       ª   ª   +---[id]
+ª   ª       ª   ª           page.tsx
+ª   ª       ª   ª           
+ª   ª       ª   +---(.)tenant
+ª   ª       ª   ª   +---[id]
+ª   ª       ª   ª           page.tsx
+ª   ª       ª   ª           
+ª   ª       ª   +---(.)user
+ª   ª       ª   ª   +---[id]
+ª   ª       ª   ª           page.tsx
+ª   ª       ª   ª           
+ª   ª       ª   +---(.)vendor
+ª   ª       ª   ª   +---[id]
+ª   ª       ª   ª           page.tsx
+ª   ª       ª   ª           
+ª   ª       ª   +---(.)work-order
+ª   ª       ª       +---[id]
+ª   ª       ª               page.tsx
+ª   ª       ª               
+ª   ª       +---@settings
+ª   ª       +---[_not-found]
+ª   ª               page.tsx
+ª   ª               
+ª   +---api
+ª       +---auth
+ª       ª   +---[...nextauth]
+ª       ª           route.ts
+ª       ª           
+ª       +---[tenant]
+ª           +---dashboard
+ª               ª   route.ts
+ª               ª   
+ª               +---events
+ª                       route.ts
+ª                       
++---components
+ª   ª   EditDialog.tsx
+ª   ª   FetchStates.tsx
+ª   ª   Footer.tsx
+ª   ª   ModeToggle.tsx
+ª   ª   Pagination.tsx
+ª   ª   SelectMulti.tsx
+ª   ª   SessionWrapper.tsx
+ª   ª   TenantProvider.tsx
+ª   ª   ThemeWrapper.tsx
+ª   ª   
+ª   +---dashboard
+ª   ª       AssetStatus.tsx
+ª   ª       DashboardHeader.tsx
+ª   ª       FloatingActionButton.tsx
+ª   ª       index.ts
+ª   ª       LowStockAlert.tsx
+ª   ª       LowStockItems.tsx
+ª   ª       MaintenanceCalls.tsx
+ª   ª       QuickActions.tsx
+ª   ª       RealTimeUpdates.tsx
+ª   ª       SearchAndFilters.tsx
+ª   ª       SignOutButton.tsx
+ª   ª       StatsCards.tsx
+ª   ª       WorkOrdersTable.tsx
+ª   ª       
+ª   +---modals
+ª   ª       AssetModal.tsx
+ª   ª       default.tsx
+ª   ª       IncidentModal.tsx
+ª   ª       MaintenanceScheduleModal.tsx
+ª   ª       modal-container.tsx
+ª   ª       PartModal.tsx
+ª   ª       TenantModal.tsx
+ª   ª       UserModal.tsx
+ª   ª       VendorModal.tsx
+ª   ª       WorkOrderModal.tsx
+ª   ª       
+ª   +---ui
+ª           accordion.tsx
+ª           alert.tsx
+ª           avatar.tsx
+ª           badge.tsx
+ª           breadcrumb.tsx
+ª           button.tsx
+ª           calendar.tsx
+ª           card.tsx
+ª           checkbox.tsx
+ª           command.tsx
+ª           dialog.tsx
+ª           dropdown-menu.tsx
+ª           form.tsx
+ª           index.ts
+ª           input.tsx
+ª           label.tsx
+ª           navigation-menu.tsx
+ª           popover.tsx
+ª           progress.tsx
+ª           radio-group.tsx
+ª           resizable.tsx
+ª           scroll-area.tsx
+ª           select.tsx
+ª           separator.tsx
+ª           skeleton.tsx
+ª           slider.tsx
+ª           sonner.tsx
+ª           switch.tsx
+ª           table.tsx
+ª           tabs.tsx
+ª           textarea.tsx
+ª           tooltip.tsx
+ª           
++---hooks
+ª       useTenantData.ts
+ª       
++---lib
+ª       auth-utils.ts
+ª       auth.ts
+ª       middleware.ts
+ª       prisma-extended.ts
+ª       prisma.ts
+ª       query.ts
+ª       tenant-cache.ts
+ª       utils.ts
+ª       
++---prisma
+ª   ª   client.d.ts
+ª   ª   client.js
+ª   ª   default.d.ts
+ª   ª   default.js
+ª   ª   edge.d.ts
+ª   ª   edge.js
+ª   ª   index-browser.js
+ª   ª   index.d.ts
+ª   ª   index.js
+ª   ª   package.json
+ª   ª   query_engine-windows.dll.node
+ª   ª   schema.prisma
+ª   ª   wasm.d.ts
+ª   ª   wasm.js
+ª   ª   
+ª   +---runtime
+ª           edge-esm.js
+ª           edge.js
+ª           index-browser.d.ts
+ª           index-browser.js
+ª           library.d.ts
+ª           library.js
+ª           react-native.js
+ª           wasm.js
+ª           
++---types
+        dashboard.ts
+        next-auth.d.ts
+        tenant.ts
+        

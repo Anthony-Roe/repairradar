@@ -1,0 +1,210 @@
+E:.
+│   clipboard.txt
+│   middleware.ts
+│   ts-exports-ai.json
+│   ts-exports.txt
+│
+├───actions
+│   │   index.ts
+│   │
+│   ├───admin
+│   │       users.ts
+│   │
+│   ├───assets
+│   │   │   index.ts
+│   │   │
+│   │   └───__tests__
+│   │           index.test.ts
+│   │
+│   ├───incidents
+│   │       index.ts
+│   │
+│   ├───maintenance
+│   │       index.ts
+│   │
+│   ├───parts
+│   │       index.ts
+│   │
+│   ├───tenants
+│   │       index.ts
+│   │
+│   ├───users
+│   │       index.ts
+│   │
+│   ├───vendors
+│   │       index.ts
+│   │
+│   └───work-orders
+│           index.ts
+│
+├───app
+│   │   favicon.ico
+│   │   globals.css
+│   │   layout.tsx
+│   │   page.tsx
+│   │
+│   ├───(auth)
+│   │   └───login
+│   ├───(tenant)
+│   │   └───[tenant]
+│   │       │   layout.tsx
+│   │       │
+│   │       ├───@analytics
+│   │       ├───@dashboard
+│   │       │   │   client.tsx
+│   │       │   │   loading.tsx
+│   │       │   │   page.tsx
+│   │       │   │
+│   │       │   └───components
+│   │       │           AssetStatus.tsx
+│   │       │           DashboardHeader.tsx
+│   │       │           FloatingActionButton.tsx
+│   │       │           LowStockItems.tsx
+│   │       │           MaintenanceCalls.tsx
+│   │       │           QuickActions.tsx
+│   │       │           RecentWorkOrders.tsx
+│   │       │           SearchAndFilters.tsx
+│   │       │           SignOutButton.tsx
+│   │       │           StatsCards.tsx
+│   │       │
+│   │       └───@settings
+│   ├───@modal
+│   │   ├───(.)asset
+│   │   │   └───[id]
+│   │   │           page.tsx
+│   │   │
+│   │   ├───(.)incident
+│   │   │   └───[id]
+│   │   │           page.tsx
+│   │   │
+│   │   ├───(.)maintenance
+│   │   │   └───[id]
+│   │   │           page.tsx
+│   │   │
+│   │   ├───(.)part
+│   │   │   └───[id]
+│   │   │           page.tsx
+│   │   │
+│   │   ├───(.)tenant
+│   │   │   └───[id]
+│   │   │           page.tsx
+│   │   │
+│   │   ├───(.)user
+│   │   │   └───[id]
+│   │   │           page.tsx
+│   │   │
+│   │   ├───(.)vendor
+│   │   │   └───[id]
+│   │   │           page.tsx
+│   │   │
+│   │   └───(.)work-order
+│   │       └───[id]
+│   │               page.tsx
+│   │
+│   └───api
+│       ├───auth
+│       │   └───[...nextauth]
+│       │           route.ts
+│       │
+│       └───[tenant]
+│           └───dashboard
+│               │   route.ts
+│               │
+│               └───events
+│                       route.ts
+│
+├───components
+│   │   EditDialog.tsx
+│   │   FetchStates.tsx
+│   │   Footer.tsx
+│   │   ModeToggle.tsx
+│   │   Pagination.tsx
+│   │   SelectMulti.tsx
+│   │   SessionWrapper.tsx
+│   │   TenantProvider.tsx
+│   │   ThemeWrapper.tsx
+│   │
+│   ├───modals
+│   │       AssetModal.tsx
+│   │       default.tsx
+│   │       IncidentModal.tsx
+│   │       MaintenanceScheduleModal.tsx
+│   │       modal-container.tsx
+│   │       PartModal.tsx
+│   │       TenantModal.tsx
+│   │       UserModal.tsx
+│   │       VendorModal.tsx
+│   │       WorkOrderModal.tsx
+│   │
+│   └───ui
+│           alert.tsx
+│           avatar.tsx
+│           badge.tsx
+│           breadcrumb.tsx
+│           button.tsx
+│           calendar.tsx
+│           card.tsx
+│           checkbox.tsx
+│           command.tsx
+│           dialog.tsx
+│           dropdown-menu.tsx
+│           form.tsx
+│           index.ts
+│           input.tsx
+│           label.tsx
+│           popover.tsx
+│           progress.tsx
+│           radio-group.tsx
+│           resizable.tsx
+│           scroll-area.tsx
+│           select.tsx
+│           slider.tsx
+│           sonner.tsx
+│           switch.tsx
+│           table.tsx
+│           tabs.tsx
+│           textarea.tsx
+│           tooltip.tsx
+│
+├───hooks
+│       useTenantData.ts
+│
+├───lib
+│       auth-utils.ts
+│       auth.ts
+│       middleware.ts
+│       prisma-extended.ts
+│       prisma.ts
+│       tenant-cache.ts
+│       utils.ts
+│
+├───prisma
+│   │   client.d.ts
+│   │   client.js
+│   │   default.d.ts
+│   │   default.js
+│   │   edge.d.ts
+│   │   edge.js
+│   │   index-browser.js
+│   │   index.d.ts
+│   │   index.js
+│   │   package.json
+│   │   query_engine-windows.dll.node
+│   │   schema.prisma
+│   │   wasm.d.ts
+│   │   wasm.js
+│   │
+│   └───runtime
+│           edge-esm.js
+│           edge.js
+│           index-browser.d.ts
+│           index-browser.js
+│           library.d.ts
+│           library.js
+│           react-native.js
+│           wasm.js
+│
+└───types
+        dashboard.ts
+        next-auth.d.ts
+        tenant.ts

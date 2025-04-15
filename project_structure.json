@@ -1,0 +1,22 @@
+{
+  "generated_at": "2025-04-09 04:31:57",
+  "summary": {
+    "files": 0,
+    "components": 0,
+    "hooks": 0,
+    "functions": 0,
+    "interfaces": 0,
+    "types": 0,
+    "classes": 0,
+    "prisma_models": 0,
+    "prisma_enums": 0,
+    "prisma_types": 0,
+    "generators": 0,
+    "datasources": 0
+  },
+  "directories": {
+    "prisma": {
+      "dbml": {}
+    }
+  }
+}

@@ -1,0 +1,525 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table tenants {
+  id String [pk]
+  name String [not null]
+  subdomain String [unique, not null]
+  parent tenants
+  parentId String
+  settings tenant_settings
+  users users [not null]
+  categories asset_categories [not null]
+  assetTypes asset_types [not null]
+  assets assets [not null]
+  meters meters [not null]
+  maintenance maintenance_schedules [not null]
+  workOrders work_orders [not null]
+  parts parts [not null]
+  vendors vendors [not null]
+  incidents incidents [not null]
+  children tenants [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  deletedAt DateTime
+}
+
+Table tenant_settings {
+  tenant tenants [not null]
+  tenantId String [pk]
+  config Json [not null, default: '{}']
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+}
+
+Table users {
+  id String [pk]
+  name String [not null]
+  email String [unique, not null]
+  emailVerified DateTime
+  image String
+  tenant tenants [not null]
+  tenantId String [not null]
+  employeeId String [unique, not null]
+  password String
+  role UserRole [not null]
+  firstName String
+  lastName String
+  accounts accounts [not null]
+  sessions sessions [not null]
+  assignments maintenance_assignments [not null]
+  workOrders work_order_assignments [not null]
+  labor work_order_labor [not null]
+  incidents incidents [not null]
+  workOrderLogs work_order_logs [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  deletedAt DateTime
+
+  indexes {
+    (tenantId, employeeId) [unique]
+    (tenantId, email) [unique]
+  }
+}
+
+Table accounts {
+  id String [pk]
+  userId String [not null]
+  user users [not null]
+  type String [not null]
+  provider String [not null]
+  providerAccountId String [not null]
+  refresh_token String
+  access_token String
+  expires_at Int
+  token_type String
+  scope String
+  id_token String
+  session_state String
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+
+  indexes {
+    (provider, providerAccountId) [unique]
+  }
+}
+
+Table sessions {
+  id String [pk]
+  sessionToken String [unique, not null]
+  userId String [not null]
+  user users [not null]
+  expires DateTime [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+}
+
+Table asset_categories {
+  id String [pk]
+  tenant tenants [not null]
+  tenantId String [not null]
+  name String [not null]
+  industry IndustryType [not null]
+  description String
+  metadata Json [not null, default: '{}']
+  assetTypes asset_types [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+
+  indexes {
+    (tenantId, name) [unique]
+  }
+}
+
+Table verification_tokens {
+  identifier String [not null]
+  token String [unique, not null]
+  expires DateTime [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+
+  indexes {
+    (identifier, token) [unique]
+  }
+}
+
+Table asset_types {
+  id String [pk]
+  tenant tenants [not null]
+  tenantId String [not null]
+  category asset_categories
+  categoryId String
+  name String [not null]
+  description String
+  expectedLifespan Int
+  maintenanceFrequency Int
+  criticality Int
+  customFields Json [not null, default: '{}']
+  assets assets [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+
+  indexes {
+    (tenantId, name) [unique]
+  }
+}
+
+Table assets {
+  id String [pk]
+  tenant tenants [not null]
+  tenantId String [not null]
+  assetType asset_types
+  assetTypeId String
+  name String [not null]
+  location String
+  status AssetStatus [not null, default: 'OPERATIONAL']
+  serialNumber String [unique]
+  purchaseDate DateTime
+  lastMaintenanceDate DateTime
+  metadata Json [not null, default: '{}']
+  assetMeters asset_meters [not null]
+  maintenance maintenance_assets [not null]
+  workOrders work_order_assets [not null]
+  incidents incidents [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  deletedAt DateTime
+}
+
+Table meters {
+  id String [pk]
+  tenant tenants [not null]
+  tenantId String [not null]
+  name String [not null]
+  unit String [not null]
+  assetMeters asset_meters [not null]
+  maintenance maintenance_schedules [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+}
+
+Table asset_meters {
+  id String [pk]
+  asset assets [not null]
+  assetId String [not null]
+  meter meters [not null]
+  meterId String [not null]
+  initialReading Decimal [not null, default: 0]
+  readings meter_readings [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+
+  indexes {
+    (assetId, meterId) [unique]
+  }
+}
+
+Table meter_readings {
+  id String [pk]
+  assetMeter asset_meters [not null]
+  assetMeterId String [not null]
+  readingValue Decimal [not null]
+  readingDate DateTime [default: `now()`, not null]
+  createdAt DateTime [default: `now()`, not null]
+}
+
+Table maintenance_schedules {
+  id String [pk]
+  tenant tenants [not null]
+  tenantId String [not null]
+  description String [not null]
+  triggerType MaintenanceTrigger [not null, default: 'TIME_BASED']
+  recurrence Json
+  meter meters
+  meterId String
+  thresholdValue Decimal
+  nextRun DateTime
+  lastRun DateTime
+  status MaintenanceStatus [not null, default: 'SCHEDULED']
+  priority CallPriority [not null, default: 'MEDIUM']
+  assignments maintenance_assignments [not null]
+  assets maintenance_assets [not null]
+  workOrders work_orders [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  deletedAt DateTime
+}
+
+Table maintenance_assignments {
+  maintenance maintenance_schedules [not null]
+  maintenanceId String [not null]
+  user users [not null]
+  userId String [not null]
+
+  indexes {
+    (maintenanceId, userId) [pk]
+  }
+}
+
+Table maintenance_assets {
+  maintenance maintenance_schedules [not null]
+  maintenanceId String [not null]
+  asset assets [not null]
+  assetId String [not null]
+
+  indexes {
+    (maintenanceId, assetId) [pk]
+  }
+}
+
+Table work_orders {
+  id String [pk]
+  tenant tenants [not null]
+  tenantId String [not null]
+  maintenance maintenance_schedules
+  maintenanceId String
+  description String [not null]
+  status WorkOrderStatus [not null, default: 'PENDING']
+  priority CallPriority [not null, default: 'MEDIUM']
+  dueDate DateTime
+  startedAt DateTime
+  completedAt DateTime
+  assignments work_order_assignments [not null]
+  assets work_order_assets [not null]
+  parts work_order_parts [not null]
+  labor work_order_labor [not null]
+  logs work_order_logs [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  deletedAt DateTime
+}
+
+Table work_order_assignments {
+  workOrder work_orders [not null]
+  workOrderId String [not null]
+  user users [not null]
+  userId String [not null]
+
+  indexes {
+    (workOrderId, userId) [pk]
+  }
+}
+
+Table work_order_assets {
+  workOrder work_orders [not null]
+  workOrderId String [not null]
+  asset assets [not null]
+  assetId String [not null]
+
+  indexes {
+    (workOrderId, assetId) [pk]
+  }
+}
+
+Table work_order_parts {
+  workOrder work_orders [not null]
+  workOrderId String [not null]
+  part parts [not null]
+  partId String [not null]
+  quantityUsed Int [not null]
+
+  indexes {
+    (workOrderId, partId) [pk]
+  }
+}
+
+Table parts {
+  id String [pk]
+  tenant tenants [not null]
+  tenantId String [not null]
+  name String [not null]
+  partNumber String [unique]
+  description String
+  quantity Int [not null, default: 0]
+  minStock Int [not null, default: 0]
+  unitCost Decimal
+  vendors part_vendors [not null]
+  workOrders work_order_parts [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  deletedAt DateTime
+}
+
+Table vendors {
+  id String [pk]
+  tenant tenants [not null]
+  tenantId String [not null]
+  name String [not null]
+  contactInfo Json
+  parts part_vendors [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  deletedAt DateTime
+}
+
+Table part_vendors {
+  part parts [not null]
+  partId String [not null]
+  vendor vendors [not null]
+  vendorId String [not null]
+  cost Decimal [not null]
+  leadTime Int
+
+  indexes {
+    (partId, vendorId) [pk]
+  }
+}
+
+Table work_order_labor {
+  id String [pk]
+  workOrder work_orders [not null]
+  workOrderId String [not null]
+  user users
+  userId String
+  hours Decimal [not null]
+  taskDescription String
+  createdAt DateTime [default: `now()`, not null]
+}
+
+Table incidents {
+  id String [pk]
+  tenant tenants [not null]
+  tenantId String [not null]
+  asset assets
+  assetId String
+  reportedBy users
+  reportedById String
+  description String [not null]
+  status CallStatus [not null, default: 'OPEN']
+  priority CallPriority [not null, default: 'MEDIUM']
+  reportedAt DateTime [default: `now()`, not null]
+  resolvedAt DateTime
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  deletedAt DateTime
+}
+
+Table work_order_logs {
+  id String [pk]
+  workOrder work_orders [not null]
+  workOrderId String [not null]
+  user users
+  userId String
+  action String [not null]
+  details Json
+  createdAt DateTime [default: `now()`, not null]
+}
+
+Enum AssetStatus {
+  OPERATIONAL
+  MAINTENANCE
+  OUT_OF_SERVICE
+  DECOMMISSIONED
+}
+
+Enum CallPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+Enum CallStatus {
+  OPEN
+  IN_PROGRESS
+  ON_HOLD
+  CLOSED
+}
+
+Enum IndustryType {
+  MANUFACTURING
+  HEALTHCARE
+  FACILITY
+  LABORATORY
+  ENERGY
+  TRANSPORTATION
+  OTHER
+}
+
+Enum MaintenanceStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  OVERDUE
+  CANCELLED
+}
+
+Enum MaintenanceTrigger {
+  TIME_BASED
+  METER_BASED
+}
+
+Enum UserRole {
+  TECHNICIAN
+  SUPERVISOR
+  MANAGER
+  ADMIN
+  SUPER_ADMIN
+}
+
+Enum WorkOrderStatus {
+  PENDING
+  IN_PROGRESS
+  ON_HOLD
+  COMPLETED
+  CANCELLED
+}
+
+Ref: tenants.parentId - tenants.id
+
+Ref: tenant_settings.tenantId - tenants.id
+
+Ref: users.tenantId > tenants.id
+
+Ref: accounts.userId > users.id [delete: Cascade]
+
+Ref: sessions.userId > users.id [delete: Cascade]
+
+Ref: asset_categories.tenantId > tenants.id
+
+Ref: asset_types.tenantId > tenants.id
+
+Ref: asset_types.categoryId > asset_categories.id
+
+Ref: assets.tenantId > tenants.id
+
+Ref: assets.assetTypeId > asset_types.id
+
+Ref: meters.tenantId > tenants.id
+
+Ref: asset_meters.assetId > assets.id
+
+Ref: asset_meters.meterId > meters.id
+
+Ref: meter_readings.assetMeterId > asset_meters.id
+
+Ref: maintenance_schedules.tenantId > tenants.id
+
+Ref: maintenance_schedules.meterId > meters.id
+
+Ref: maintenance_assignments.maintenanceId > maintenance_schedules.id
+
+Ref: maintenance_assignments.userId > users.id
+
+Ref: maintenance_assets.maintenanceId > maintenance_schedules.id
+
+Ref: maintenance_assets.assetId > assets.id
+
+Ref: work_orders.tenantId > tenants.id
+
+Ref: work_orders.maintenanceId > maintenance_schedules.id
+
+Ref: work_order_assignments.workOrderId > work_orders.id
+
+Ref: work_order_assignments.userId > users.id
+
+Ref: work_order_assets.workOrderId > work_orders.id
+
+Ref: work_order_assets.assetId > assets.id
+
+Ref: work_order_parts.workOrderId > work_orders.id
+
+Ref: work_order_parts.partId > parts.id
+
+Ref: parts.tenantId > tenants.id
+
+Ref: vendors.tenantId > tenants.id
+
+Ref: part_vendors.partId > parts.id
+
+Ref: part_vendors.vendorId > vendors.id
+
+Ref: work_order_labor.workOrderId > work_orders.id
+
+Ref: work_order_labor.userId > users.id
+
+Ref: incidents.tenantId > tenants.id
+
+Ref: incidents.assetId > assets.id
+
+Ref: incidents.reportedById > users.id
+
+Ref: work_order_logs.workOrderId > work_orders.id
+
+Ref: work_order_logs.userId > users.id

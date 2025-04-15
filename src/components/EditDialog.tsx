@@ -29,7 +29,7 @@ type StatusOption = {
   label: string;
 };
 
-type FieldType = 'text' | 'number' | 'select' | 'selectmulti' | 'date' | 'time' | 'datetime';
+type FieldType = 'text' | 'number' | 'select' | 'selectmulti' | 'date' | 'time' | 'datetime' | 'currency';
 
 type EditDialogProps = {
   open: boolean;
@@ -212,6 +212,35 @@ export function EditDialog({
             </div>
           </div>
         );
+
+        case 'currency':
+          return (
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+              <Input
+                id={field.name}
+                type="text"
+                className="pl-6"
+                value={formData[field.name] || ''}
+                onChange={(e) => {
+                  // Update the raw value without formatting while typing
+                  handleChange(field.name, e.target.value);
+                }}
+                onBlur={(e) => {
+                  // When the input field loses focus, format the value as currency
+                  const rawValue = e.target.value.replace(/[^\d.]/g, ''); // Remove non-numeric characters
+                  const formattedValue = parseFloat(rawValue).toLocaleString('en-US', {
+                    style: 'decimal',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  });
+                  handleChange(field.name, formattedValue); // Update formatted value
+                }}
+                required={field.required}
+              />
+            </div>
+          );
+
 
       default:
         return (

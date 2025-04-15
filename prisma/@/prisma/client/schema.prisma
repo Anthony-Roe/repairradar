@@ -1,0 +1,497 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator dbml {
+  provider = "prisma-dbml-generator"
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "@/prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AssetStatus {
+  OPERATIONAL
+  MAINTENANCE
+  OUT_OF_SERVICE
+  DECOMMISSIONED
+}
+
+enum CallPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum CallStatus {
+  OPEN
+  IN_PROGRESS
+  ON_HOLD
+  CLOSED
+}
+
+enum IndustryType {
+  MANUFACTURING
+  HEALTHCARE
+  FACILITY
+  LABORATORY
+  ENERGY
+  TRANSPORTATION
+  OTHER
+}
+
+enum MaintenanceStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  OVERDUE
+  CANCELLED
+}
+
+enum MaintenanceTrigger {
+  TIME_BASED
+  METER_BASED
+}
+
+enum UserRole {
+  TECHNICIAN
+  SUPERVISOR
+  MANAGER
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum WorkOrderStatus {
+  PENDING
+  IN_PROGRESS
+  ON_HOLD
+  COMPLETED
+  CANCELLED
+}
+
+model Tenant {
+  id          String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String
+  subdomain   String                @unique
+  parent      Tenant?               @relation("TenantParent", fields: [parentId], references: [id])
+  parentId    String?               @db.Uuid
+  settings    TenantSettings?
+  users       User[]
+  categories  AssetCategory[]
+  assetTypes  AssetType[]
+  assets      Asset[]
+  meters      Meter[]
+  maintenance MaintenanceSchedule[]
+  workOrders  WorkOrder[]
+  parts       Part[]
+  vendors     Vendor[]
+  incidents   Incident[]
+  children    Tenant[]              @relation("TenantParent")
+  createdAt   DateTime              @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime              @default(now()) @map("updated_at") @db.Timestamptz(6)
+  deletedAt   DateTime?             @map("deleted_at") @db.Timestamptz(6)
+
+  @@map("tenants")
+}
+
+model TenantSettings {
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  tenantId  String   @id @db.Uuid
+  config    Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@map("tenant_settings")
+}
+
+// Enhanced User model for Next-Auth
+model User {
+  id            String    @id @default(uuid()) @db.Uuid
+  name          String
+  email         String    @unique
+  emailVerified DateTime? @map("email_verified")
+  image         String?
+  tenant        Tenant    @relation(fields: [tenantId], references: [id])
+  tenantId      String    @db.Uuid
+  employeeId    String    @unique
+  password      String?   @map("password_hash") // Made optional for OAuth users
+  role          UserRole
+  firstName     String?   @map("first_name")
+  lastName      String?   @map("last_name")
+
+  // Next-Auth required relations
+  accounts Account[]
+  sessions Session[]
+
+  // Application relations
+  assignments   MaintenanceAssignment[]
+  workOrders    WorkOrderAssignment[]
+  labor         WorkOrderLabor[]
+  incidents     Incident[]
+  workOrderLogs WorkOrderLog[]
+
+  // Timestamps
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz(6)
+
+  // Indexes & Constraints
+  @@unique([tenantId, employeeId])
+  @@unique([tenantId, email])
+  // Optimized indexes for query performance
+  @@index([tenantId])
+  @@index([employeeId])
+  @@index([email])
+  @@index([role])
+  @@map("users")
+}
+
+// Next-Auth Account model (optimized)
+model Account {
+  id                String   @id @default(uuid()) @db.Uuid
+  userId            String   @db.Uuid
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type              String   @db.VarChar(255)
+  provider          String   @db.VarChar(255)
+  providerAccountId String   @db.VarChar(255)
+  refresh_token     String?  @db.Text
+  access_token      String?  @db.Text
+  expires_at        Int?
+  token_type        String?  @db.VarChar(255)
+  scope             String?  @db.VarChar(255)
+  id_token          String?  @db.Text
+  session_state     String?  @db.VarChar(255)
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  // Required by Next-Auth
+  @@unique([provider, providerAccountId])
+  // Performance optimizations
+  @@index([userId])
+  @@index([provider])
+  @@map("accounts")
+}
+
+// Next-Auth Session model (optimized)
+model Session {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  sessionToken String   @unique @db.VarChar(255)
+  userId       String   @db.Uuid
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expires      DateTime @db.Timestamptz(6)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  // Performance optimizations
+  @@index([userId])
+  @@index([sessionToken])
+  @@map("sessions")
+}
+
+model AssetCategory {
+  id          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenant      Tenant       @relation(fields: [tenantId], references: [id])
+  tenantId    String       @db.Uuid
+  name        String
+  industry    IndustryType
+  description String?
+  metadata    Json         @default("{}")
+  assetTypes  AssetType[]
+  createdAt   DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime     @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@unique([tenantId, name])
+  @@map("asset_categories")
+}
+
+// Next-Auth Verification Token model (required for email verification)
+model VerificationToken {
+  identifier String   @db.VarChar(255)
+  token      String   @unique @db.VarChar(255)
+  expires    DateTime @db.Timestamptz(6)
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model AssetType {
+  id                   String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenant               Tenant         @relation(fields: [tenantId], references: [id])
+  tenantId             String         @db.Uuid
+  category             AssetCategory? @relation(fields: [categoryId], references: [id])
+  categoryId           String?        @db.Uuid
+  name                 String
+  description          String?
+  expectedLifespan     Int?           @map("expected_lifespan")
+  maintenanceFrequency Int?           @map("maintenance_frequency")
+  criticality          Int?
+  customFields         Json           @default("{}") @map("custom_fields")
+  assets               Asset[]
+  createdAt            DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt            DateTime       @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@unique([tenantId, name])
+  @@map("asset_types")
+}
+
+model Asset {
+  id                  String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenant              Tenant              @relation(fields: [tenantId], references: [id])
+  tenantId            String              @db.Uuid
+  assetType           AssetType?          @relation(fields: [assetTypeId], references: [id])
+  assetTypeId         String?             @db.Uuid
+  name                String
+  location            String?
+  status              AssetStatus         @default(OPERATIONAL)
+  serialNumber        String?             @unique @map("serial_number")
+  purchaseDate        DateTime?           @map("purchase_date") @db.Date
+  lastMaintenanceDate DateTime?           @map("last_maintenance_date") @db.Timestamptz(6)
+  metadata            Json                @default("{}")
+  assetMeters         AssetMeter[]
+  maintenance         MaintenanceAssets[]
+  workOrders          WorkOrderAssets[]
+  incidents           Incident[]
+  createdAt           DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime            @default(now()) @map("updated_at") @db.Timestamptz(6)
+  deletedAt           DateTime?           @map("deleted_at") @db.Timestamptz(6)
+
+  @@map("assets")
+}
+
+model Meter {
+  id          String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenant      Tenant                @relation(fields: [tenantId], references: [id])
+  tenantId    String                @db.Uuid
+  name        String
+  unit        String
+  assetMeters AssetMeter[]
+  maintenance MaintenanceSchedule[]
+  createdAt   DateTime              @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime              @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@map("meters")
+}
+
+model AssetMeter {
+  id             String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  asset          Asset          @relation(fields: [assetId], references: [id])
+  assetId        String         @db.Uuid
+  meter          Meter          @relation(fields: [meterId], references: [id])
+  meterId        String         @db.Uuid
+  initialReading Decimal        @default(0) @map("initial_reading") @db.Decimal(15, 2)
+  readings       MeterReading[]
+  createdAt      DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime       @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@unique([assetId, meterId])
+  @@map("asset_meters")
+}
+
+model MeterReading {
+  id           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  assetMeter   AssetMeter @relation(fields: [assetMeterId], references: [id])
+  assetMeterId String     @db.Uuid
+  readingValue Decimal    @map("reading_value") @db.Decimal(15, 2)
+  readingDate  DateTime   @default(now()) @map("reading_date") @db.Timestamptz(6)
+  createdAt    DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("meter_readings")
+}
+
+model MaintenanceSchedule {
+  id             String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenant         Tenant                  @relation(fields: [tenantId], references: [id])
+  tenantId       String                  @db.Uuid
+  description    String
+  triggerType    MaintenanceTrigger      @default(TIME_BASED) @map("trigger_type")
+  recurrence     Json?
+  meter          Meter?                  @relation(fields: [meterId], references: [id])
+  meterId        String?                 @db.Uuid
+  thresholdValue Decimal?                @map("threshold_value") @db.Decimal(15, 2)
+  nextRun        DateTime?               @map("next_run") @db.Timestamptz(6)
+  lastRun        DateTime?               @map("last_run") @db.Timestamptz(6)
+  status         MaintenanceStatus       @default(SCHEDULED)
+  priority       CallPriority            @default(MEDIUM)
+  assignments    MaintenanceAssignment[]
+  assets         MaintenanceAssets[]
+  workOrders     WorkOrder[]
+  createdAt      DateTime                @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime                @default(now()) @map("updated_at") @db.Timestamptz(6)
+  deletedAt      DateTime?               @map("deleted_at") @db.Timestamptz(6)
+
+  @@map("maintenance_schedules")
+}
+
+model MaintenanceAssignment {
+  maintenance   MaintenanceSchedule @relation(fields: [maintenanceId], references: [id])
+  maintenanceId String              @db.Uuid
+  user          User                @relation(fields: [userId], references: [id])
+  userId        String              @db.Uuid
+
+  @@id([maintenanceId, userId])
+  @@map("maintenance_assignments")
+}
+
+model MaintenanceAssets {
+  maintenance   MaintenanceSchedule @relation(fields: [maintenanceId], references: [id])
+  maintenanceId String              @db.Uuid
+  asset         Asset               @relation(fields: [assetId], references: [id])
+  assetId       String              @db.Uuid
+
+  @@id([maintenanceId, assetId])
+  @@map("maintenance_assets")
+}
+
+model WorkOrder {
+  id            String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenant        Tenant                @relation(fields: [tenantId], references: [id])
+  tenantId      String                @db.Uuid
+  maintenance   MaintenanceSchedule?  @relation(fields: [maintenanceId], references: [id])
+  maintenanceId String?               @db.Uuid
+  description   String
+  status        WorkOrderStatus       @default(PENDING)
+  priority      CallPriority          @default(MEDIUM)
+  dueDate       DateTime?             @map("due_date") @db.Timestamptz(6)
+  startedAt     DateTime?             @map("started_at") @db.Timestamptz(6)
+  completedAt   DateTime?             @map("completed_at") @db.Timestamptz(6)
+  assignments   WorkOrderAssignment[]
+  assets        WorkOrderAssets[]
+  parts         WorkOrderParts[]
+  labor         WorkOrderLabor[]
+  logs          WorkOrderLog[]
+  createdAt     DateTime              @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime              @default(now()) @map("updated_at") @db.Timestamptz(6)
+  deletedAt     DateTime?             @map("deleted_at") @db.Timestamptz(6)
+
+  @@map("work_orders")
+}
+
+model WorkOrderAssignment {
+  workOrder   WorkOrder @relation(fields: [workOrderId], references: [id])
+  workOrderId String    @db.Uuid
+  user        User      @relation(fields: [userId], references: [id])
+  userId      String    @db.Uuid
+
+  @@id([workOrderId, userId])
+  @@map("work_order_assignments")
+}
+
+model WorkOrderAssets {
+  workOrder   WorkOrder @relation(fields: [workOrderId], references: [id])
+  workOrderId String    @db.Uuid
+  asset       Asset     @relation(fields: [assetId], references: [id])
+  assetId     String    @db.Uuid
+
+  @@id([workOrderId, assetId])
+  @@map("work_order_assets")
+}
+
+model WorkOrderParts {
+  workOrder    WorkOrder @relation(fields: [workOrderId], references: [id])
+  workOrderId  String    @db.Uuid
+  part         Part      @relation(fields: [partId], references: [id])
+  partId       String    @db.Uuid
+  quantityUsed Int       @map("quantity_used")
+
+  @@id([workOrderId, partId])
+  @@map("work_order_parts")
+}
+
+model Part {
+  id          String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenant      Tenant           @relation(fields: [tenantId], references: [id])
+  tenantId    String           @db.Uuid
+  name        String
+  partNumber  String?          @unique @map("part_number")
+  description String?
+  quantity    Int              @default(0)
+  minStock    Int              @default(0) @map("min_stock")
+  unitCost    Decimal?         @map("unit_cost") @db.Decimal(10, 2)
+  vendors     PartVendor[]
+  workOrders  WorkOrderParts[]
+  createdAt   DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime         @default(now()) @map("updated_at") @db.Timestamptz(6)
+  deletedAt   DateTime?        @map("deleted_at") @db.Timestamptz(6)
+
+  @@map("parts")
+}
+
+model Vendor {
+  id          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenant      Tenant       @relation(fields: [tenantId], references: [id])
+  tenantId    String       @db.Uuid
+  name        String
+  contactInfo Json?        @map("contact_info")
+  parts       PartVendor[]
+  createdAt   DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime     @default(now()) @map("updated_at") @db.Timestamptz(6)
+  deletedAt   DateTime?    @map("deleted_at") @db.Timestamptz(6)
+
+  @@map("vendors")
+}
+
+model PartVendor {
+  part     Part    @relation(fields: [partId], references: [id])
+  partId   String  @db.Uuid
+  vendor   Vendor  @relation(fields: [vendorId], references: [id])
+  vendorId String  @db.Uuid
+  cost     Decimal @db.Decimal(10, 2)
+  leadTime Int?    @map("lead_time")
+
+  @@id([partId, vendorId])
+  @@map("part_vendors")
+}
+
+model WorkOrderLabor {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  workOrder       WorkOrder @relation(fields: [workOrderId], references: [id])
+  workOrderId     String    @db.Uuid
+  user            User?     @relation(fields: [userId], references: [id])
+  userId          String?   @db.Uuid
+  hours           Decimal   @db.Decimal(5, 2)
+  taskDescription String?   @map("task_description")
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("work_order_labor")
+}
+
+model Incident {
+  id           String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenant       Tenant       @relation(fields: [tenantId], references: [id])
+  tenantId     String       @db.Uuid
+  asset        Asset?       @relation(fields: [assetId], references: [id])
+  assetId      String?      @db.Uuid
+  reportedBy   User?        @relation(fields: [reportedById], references: [id])
+  reportedById String?      @db.Uuid
+  description  String
+  status       CallStatus   @default(OPEN)
+  priority     CallPriority @default(MEDIUM)
+  reportedAt   DateTime     @default(now()) @map("reported_at") @db.Timestamptz(6)
+  resolvedAt   DateTime?    @map("resolved_at") @db.Timestamptz(6)
+  createdAt    DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime     @default(now()) @map("updated_at") @db.Timestamptz(6)
+  deletedAt    DateTime?    @map("deleted_at") @db.Timestamptz(6)
+
+  @@map("incidents")
+}
+
+model WorkOrderLog {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  workOrder   WorkOrder @relation(fields: [workOrderId], references: [id])
+  workOrderId String    @db.Uuid
+  user        User?     @relation(fields: [userId], references: [id])
+  userId      String?   @db.Uuid
+  action      String
+  details     Json?
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("work_order_logs")
+}

@@ -22,9 +22,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts",
-    "src/prisma/seed.ts", ".ai-assistant/ai.ts", "scripts/seed.ts", "src/**/*.ts", 
-    //"src/shared/modules/orchestrator.ts.bak"  
+    ".next/types/**/*.ts",    //"src/shared/modules/orchestrator.ts.bak"  
   ],
   "exclude": ["node_modules"]
 }

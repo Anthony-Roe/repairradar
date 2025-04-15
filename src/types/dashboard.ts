@@ -1,9 +1,23 @@
-import { Asset, WorkOrder, Part, Vendor, Incident } from "@prisma/client";
+import { Asset, WorkOrder, Part, Vendor, Incident, MaintenanceSchedule, AssetCategory, AssetType, User } from "@prisma/client";
+import { Metric } from "@prisma/client/runtime/library";
 
-export interface DashboardData {
-    assets: Asset[]; // Replace with actual type
-    workOrders: WorkOrder[]; // Replace with actual type
-    incident: Incident[]; // Replace with actual type
-    parts: Part[]; // Replace with actual type
-    vendors: Vendor[]; // Replace with actual type
-  };
+  export interface DashboardData {
+    assets: Asset[];
+    incidents: Incident[];
+    workOrders: WorkOrder[];
+    parts: Part[];
+    timestamp?: string;
+    // Add other fields as needed from server actions response
+    vendors?: Vendor[];
+    maintenanceSchedules?: any[];
+    assetCategories?: any[];
+    assetTypes?: any[];
+    metrics?: {
+      activeCalls: number;
+      criticalCalls: number;
+      openWorkOrders: number;
+      inProgressWorkOrders: number;
+      overdueMaintenance: number;
+      lowStockParts: number;
+    };
+  }

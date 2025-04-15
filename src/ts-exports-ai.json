@@ -1,0 +1,4285 @@
+[
+  {
+    "filePath": "E:/Dev/websites/repairradar-v0.1/src/middleware.ts",
+    "exports": [
+      {
+        "name": "middleware",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "handler"
+        ],
+        "referencedVariables": [
+          "middleware",
+          "request",
+          "NextRequest",
+          "handler"
+        ],
+        "signature": "export async function middleware(request: NextRequest) {\r\n  return await handler(request)\r\n}",
+        "snippet": "export async function middleware(request: NextRequest) {\r\n  return await handler(request)\r\n}"
+      },
+      {
+        "name": "config",
+        "kind": "VariableDeclaration",
+        "documentation": [],
+        "calledFunctions": [],
+        "referencedVariables": [
+          "config",
+          "matcher"
+        ],
+        "signature": null,
+        "snippet": "config = {\r\n  matcher: [\r\n    // Match all paths except:\r\n    // - /api (API routes)\r\n    // - /_next/static (static files)\r\n    // - /_next/image (image optimization)\r\n    // - /favicon.ico\r\n    '/((?!api|auth|_next/static|_next/image|favicon.ico).*)',\r\n  ],\r\n}"
+      }
+    ]
+  },
+  {
+    "filePath": "E:/Dev/websites/repairradar-v0.1/src/actions/index.ts",
+    "exports": [
+      {
+        "name": "createAsset",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// Asset"
+        ],
+        "calledFunctions": [
+          "prisma.asset.create"
+        ],
+        "referencedVariables": [
+          "createAsset",
+          "data",
+          "Prisma",
+          "AssetUncheckedCreateInput",
+          "prisma",
+          "asset",
+          "create"
+        ],
+        "signature": "export async function createAsset(data: Prisma.AssetUncheckedCreateInput) {\r\n        return prisma.asset.create({ data });\r\n}",
+        "snippet": "export async function createAsset(data: Prisma.AssetUncheckedCreateInput) {\r\n        return prisma.asset.create({ data });\r\n}"
+      },
+      {
+        "name": "updateAsset",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.asset.update"
+        ],
+        "referencedVariables": [
+          "updateAsset",
+          "id",
+          "data",
+          "Prisma",
+          "AssetUncheckedUpdateInput",
+          "prisma",
+          "asset",
+          "update",
+          "where"
+        ],
+        "signature": "export async function updateAsset(id: string, data: Prisma.AssetUncheckedUpdateInput) {\r\n  return prisma.asset.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}",
+        "snippet": "export async function updateAsset(id: string, data: Prisma.AssetUncheckedUpdateInput) {\r\n  return prisma.asset.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}"
+      },
+      {
+        "name": "deleteAsset",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.asset.update"
+        ],
+        "referencedVariables": [
+          "deleteAsset",
+          "id",
+          "prisma",
+          "asset",
+          "update",
+          "where",
+          "data",
+          "deletedAt",
+          "Date"
+        ],
+        "signature": "export async function deleteAsset(id: string) {\r\n  return prisma.asset.update({\r\n    where: { id },\r\n    data: { deletedAt: new Date() },\r\n  });\r\n}",
+        "snippet": "export async function deleteAsset(id: string) {\r\n  return prisma.asset.update({\r\n    where: { id },\r\n    data: { deletedAt: new Date() },\r\n  });\r\n}"
+      },
+      {
+        "name": "getAsset",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.asset.findUnique"
+        ],
+        "referencedVariables": [
+          "getAsset",
+          "id",
+          "prisma",
+          "asset",
+          "findUnique",
+          "where",
+          "include",
+          "assetType",
+          "assetMeters",
+          "meter"
+        ],
+        "signature": "export async function getAsset(id: string) {\r\n  return prisma.asset.findUnique({\r\n    where: { id },\r\n    include: { assetType: true, assetMeters: { include: { meter: true } } },\r\n  });\r\n}",
+        "snippet": "export async function getAsset(id: string) {\r\n  return prisma.asset.findUnique({\r\n    where: { id },\r\n    include: { assetType: true, assetMeters: { include: { meter: true } } },\r\n  });\r\n}"
+      },
+      {
+        "name": "getAssets",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "Promise.all",
+          "prisma.asset.findMany",
+          "prisma.asset.count"
+        ],
+        "referencedVariables": [
+          "getAssets",
+          "tenantId",
+          "skip",
+          "take",
+          "assets",
+          "total",
+          "Promise",
+          "all",
+          "prisma",
+          "asset",
+          "findMany",
+          "where",
+          "deletedAt",
+          "include",
+          "assetType",
+          "count"
+        ],
+        "signature": "export async function getAssets({\r\n  tenantId,\r\n  skip = 0,\r\n  take = 10,\r\n}: {\r\n  tenantId: string;\r\n  skip?: number;\r\n  take?: number;\r\n}) {\r\n  const [assets, total] = await Promise.all([\r\n    prisma.asset.findMany({\r\n      where: { tenantId, deletedAt: null },\r\n      include: { assetType: true },\r\n      skip,\r\n      take,\r\n    }),\r\n    prisma.asset.count({ where: { tenantId, deletedAt: null } }),\r\n  ]);\r\n  return { assets, total };\r\n}",
+        "snippet": "export async function getAssets({\r\n  tenantId,\r\n  skip = 0,\r\n  take = 10,\r\n}: {\r\n  tenantId: string;\r\n  skip?: number;\r\n  take?: number;\r\n}) {\r\n  const [assets, total] = await Promise.all([\r\n    prisma.asset.findMany({\r\n      where: { tenantId, deletedAt: null },\r\n      include: { assetType: true },\r\n      skip,\r\n      take,\r\n    }),\r\n    prisma.asset.count({ where: { tenantId, deletedAt: null } }),\r\n  ]);\r\n  return { assets, total };\r\n}"
+      },
+      {
+        "name": "createAssetCategory",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// AssetCategory"
+        ],
+        "calledFunctions": [
+          "prisma.assetCategory.create"
+        ],
+        "referencedVariables": [
+          "createAssetCategory",
+          "data",
+          "Prisma",
+          "AssetCategoryUncheckedCreateInput",
+          "prisma",
+          "assetCategory",
+          "create"
+        ],
+        "signature": "export async function createAssetCategory(data: Prisma.AssetCategoryUncheckedCreateInput) {\r\n  return prisma.assetCategory.create({ data });\r\n}",
+        "snippet": "export async function createAssetCategory(data: Prisma.AssetCategoryUncheckedCreateInput) {\r\n  return prisma.assetCategory.create({ data });\r\n}"
+      },
+      {
+        "name": "updateAssetCategory",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.assetCategory.update"
+        ],
+        "referencedVariables": [
+          "updateAssetCategory",
+          "id",
+          "data",
+          "Prisma",
+          "AssetCategoryUpdateInput",
+          "prisma",
+          "assetCategory",
+          "update",
+          "where"
+        ],
+        "signature": "export async function updateAssetCategory(id: string, data: Prisma.AssetCategoryUpdateInput) {\r\n  return prisma.assetCategory.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}",
+        "snippet": "export async function updateAssetCategory(id: string, data: Prisma.AssetCategoryUpdateInput) {\r\n  return prisma.assetCategory.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}"
+      },
+      {
+        "name": "getAssetCategories",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.assetCategory.findMany"
+        ],
+        "referencedVariables": [
+          "getAssetCategories",
+          "tenantId",
+          "prisma",
+          "assetCategory",
+          "findMany",
+          "where"
+        ],
+        "signature": "export async function getAssetCategories(tenantId: string) {\r\n  return prisma.assetCategory.findMany({\r\n    where: { tenantId },\r\n  });\r\n}",
+        "snippet": "export async function getAssetCategories(tenantId: string) {\r\n  return prisma.assetCategory.findMany({\r\n    where: { tenantId },\r\n  });\r\n}"
+      },
+      {
+        "name": "createAssetType",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// AssetType"
+        ],
+        "calledFunctions": [
+          "prisma.assetType.create"
+        ],
+        "referencedVariables": [
+          "createAssetType",
+          "data",
+          "Prisma",
+          "AssetTypeUncheckedCreateInput",
+          "prisma",
+          "assetType",
+          "create"
+        ],
+        "signature": "export async function createAssetType(data: Prisma.AssetTypeUncheckedCreateInput) {\r\n  return prisma.assetType.create({ data });\r\n}",
+        "snippet": "export async function createAssetType(data: Prisma.AssetTypeUncheckedCreateInput) {\r\n  return prisma.assetType.create({ data });\r\n}"
+      },
+      {
+        "name": "updateAssetType",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.assetType.update"
+        ],
+        "referencedVariables": [
+          "updateAssetType",
+          "id",
+          "data",
+          "Prisma",
+          "AssetTypeUpdateInput",
+          "prisma",
+          "assetType",
+          "update",
+          "where"
+        ],
+        "signature": "export async function updateAssetType(id: string, data: Prisma.AssetTypeUpdateInput) {\r\n  return prisma.assetType.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}",
+        "snippet": "export async function updateAssetType(id: string, data: Prisma.AssetTypeUpdateInput) {\r\n  return prisma.assetType.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}"
+      },
+      {
+        "name": "getAssetTypes",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.assetType.findMany"
+        ],
+        "referencedVariables": [
+          "getAssetTypes",
+          "tenantId",
+          "prisma",
+          "assetType",
+          "findMany",
+          "where",
+          "include",
+          "category"
+        ],
+        "signature": "export async function getAssetTypes(tenantId: string) {\r\n  return prisma.assetType.findMany({\r\n    where: { tenantId },\r\n    include: { category: true },\r\n  });\r\n}",
+        "snippet": "export async function getAssetTypes(tenantId: string) {\r\n  return prisma.assetType.findMany({\r\n    where: { tenantId },\r\n    include: { category: true },\r\n  });\r\n}"
+      },
+      {
+        "name": "createAssetMeter",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// AssetMeter"
+        ],
+        "calledFunctions": [
+          "prisma.assetMeter.create"
+        ],
+        "referencedVariables": [
+          "createAssetMeter",
+          "data",
+          "Prisma",
+          "AssetMeterUncheckedCreateInput",
+          "prisma",
+          "assetMeter",
+          "create"
+        ],
+        "signature": "export async function createAssetMeter(data: Prisma.AssetMeterUncheckedCreateInput) {\r\n  return prisma.assetMeter.create({ data });\r\n}",
+        "snippet": "export async function createAssetMeter(data: Prisma.AssetMeterUncheckedCreateInput) {\r\n  return prisma.assetMeter.create({ data });\r\n}"
+      },
+      {
+        "name": "updateAssetMeter",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.assetMeter.update"
+        ],
+        "referencedVariables": [
+          "updateAssetMeter",
+          "id",
+          "data",
+          "Prisma",
+          "AssetMeterUpdateInput",
+          "prisma",
+          "assetMeter",
+          "update",
+          "where"
+        ],
+        "signature": "export async function updateAssetMeter(id: string, data: Prisma.AssetMeterUpdateInput) {\r\n  return prisma.assetMeter.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}",
+        "snippet": "export async function updateAssetMeter(id: string, data: Prisma.AssetMeterUpdateInput) {\r\n  return prisma.assetMeter.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}"
+      },
+      {
+        "name": "createMeterReading",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// MeterReading"
+        ],
+        "calledFunctions": [
+          "prisma.meterReading.create"
+        ],
+        "referencedVariables": [
+          "createMeterReading",
+          "data",
+          "Prisma",
+          "MeterReadingCreateInput",
+          "prisma",
+          "meterReading",
+          "create"
+        ],
+        "signature": "export async function createMeterReading(data: Prisma.MeterReadingCreateInput) {\r\n  return prisma.meterReading.create({ data });\r\n}",
+        "snippet": "export async function createMeterReading(data: Prisma.MeterReadingCreateInput) {\r\n  return prisma.meterReading.create({ data });\r\n}"
+      },
+      {
+        "name": "getMeterReadings",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.meterReading.findMany"
+        ],
+        "referencedVariables": [
+          "getMeterReadings",
+          "assetMeterId",
+          "prisma",
+          "meterReading",
+          "findMany",
+          "where",
+          "orderBy",
+          "readingDate"
+        ],
+        "signature": "export async function getMeterReadings(assetMeterId: string) {\r\n  return prisma.meterReading.findMany({\r\n    where: { assetMeterId },\r\n    orderBy: { readingDate: \"desc\" },\r\n  });\r\n}",
+        "snippet": "export async function getMeterReadings(assetMeterId: string) {\r\n  return prisma.meterReading.findMany({\r\n    where: { assetMeterId },\r\n    orderBy: { readingDate: \"desc\" },\r\n  });\r\n}"
+      },
+      {
+        "name": "createIncident",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.incident.create"
+        ],
+        "referencedVariables": [
+          "createIncident",
+          "data",
+          "Prisma",
+          "IncidentUncheckedCreateInput",
+          "prisma",
+          "incident",
+          "create"
+        ],
+        "signature": "export async function createIncident(data: Prisma.IncidentUncheckedCreateInput) {\r\n  return prisma.incident.create({ data });\r\n}",
+        "snippet": "export async function createIncident(data: Prisma.IncidentUncheckedCreateInput) {\r\n  return prisma.incident.create({ data });\r\n}"
+      },
+      {
+        "name": "updateIncident",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.incident.update"
+        ],
+        "referencedVariables": [
+          "updateIncident",
+          "id",
+          "data",
+          "Prisma",
+          "IncidentUncheckedUpdateInput",
+          "prisma",
+          "incident",
+          "update",
+          "where"
+        ],
+        "signature": "export async function updateIncident(id: string, data: Prisma.IncidentUncheckedUpdateInput) {\r\n  return prisma.incident.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}",
+        "snippet": "export async function updateIncident(id: string, data: Prisma.IncidentUncheckedUpdateInput) {\r\n  return prisma.incident.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}"
+      },
+      {
+        "name": "deleteIncident",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.incident.update"
+        ],
+        "referencedVariables": [
+          "deleteIncident",
+          "id",
+          "prisma",
+          "incident",
+          "update",
+          "where",
+          "data",
+          "deletedAt",
+          "Date"
+        ],
+        "signature": "export async function deleteIncident(id: string) {\r\n  return prisma.incident.update({\r\n    where: { id },\r\n    data: { deletedAt: new Date() },\r\n  });\r\n}",
+        "snippet": "export async function deleteIncident(id: string) {\r\n  return prisma.incident.update({\r\n    where: { id },\r\n    data: { deletedAt: new Date() },\r\n  });\r\n}"
+      },
+      {
+        "name": "getIncident",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.incident.findUnique"
+        ],
+        "referencedVariables": [
+          "getIncident",
+          "id",
+          "prisma",
+          "incident",
+          "findUnique",
+          "where",
+          "include",
+          "asset",
+          "reportedBy"
+        ],
+        "signature": "export async function getIncident(id: string) {\r\n  return prisma.incident.findUnique({\r\n    where: { id },\r\n    include: { asset: true, reportedBy: true },\r\n  });\r\n}",
+        "snippet": "export async function getIncident(id: string) {\r\n  return prisma.incident.findUnique({\r\n    where: { id },\r\n    include: { asset: true, reportedBy: true },\r\n  });\r\n}"
+      },
+      {
+        "name": "getIncidents",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "Promise.all",
+          "prisma.incident.findMany",
+          "prisma.incident.count"
+        ],
+        "referencedVariables": [
+          "getIncidents",
+          "tenantId",
+          "skip",
+          "take",
+          "incidents",
+          "total",
+          "Promise",
+          "all",
+          "prisma",
+          "incident",
+          "findMany",
+          "where",
+          "deletedAt",
+          "include",
+          "asset",
+          "reportedBy",
+          "count"
+        ],
+        "signature": "export async function getIncidents({\r\n  tenantId,\r\n  skip = 0,\r\n  take = 10,\r\n}: {\r\n  tenantId: string;\r\n  skip?: number;\r\n  take?: number;\r\n}) {\r\n  const [incidents, total] = await Promise.all([\r\n    prisma.incident.findMany({\r\n      where: { tenantId, deletedAt: null },\r\n      include: { asset: true, reportedBy: true },\r\n      skip,\r\n      take,\r\n    }),\r\n    prisma.incident.count({ where: { tenantId, deletedAt: null } }),\r\n  ]);\r\n  return { incidents, total };\r\n}",
+        "snippet": "export async function getIncidents({\r\n  tenantId,\r\n  skip = 0,\r\n  take = 10,\r\n}: {\r\n  tenantId: string;\r\n  skip?: number;\r\n  take?: number;\r\n}) {\r\n  const [incidents, total] = await Promise.all([\r\n    prisma.incident.findMany({\r\n      where: { tenantId, deletedAt: null },\r\n      include: { asset: true, reportedBy: true },\r\n      skip,\r\n      take,\r\n    }),\r\n    prisma.incident.count({ where: { tenantId, deletedAt: null } }),\r\n  ]);\r\n  return { incidents, total };\r\n}"
+      },
+      {
+        "name": "createMaintenanceSchedule",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// MaintenanceSchedule"
+        ],
+        "calledFunctions": [
+          "prisma.maintenanceSchedule.create"
+        ],
+        "referencedVariables": [
+          "createMaintenanceSchedule",
+          "data",
+          "Prisma",
+          "MaintenanceScheduleUncheckedCreateInput",
+          "prisma",
+          "maintenanceSchedule",
+          "create"
+        ],
+        "signature": "export async function createMaintenanceSchedule(data: Prisma.MaintenanceScheduleUncheckedCreateInput) {\r\n  return prisma.maintenanceSchedule.create({ data });\r\n}",
+        "snippet": "export async function createMaintenanceSchedule(data: Prisma.MaintenanceScheduleUncheckedCreateInput) {\r\n  return prisma.maintenanceSchedule.create({ data });\r\n}"
+      },
+      {
+        "name": "updateMaintenanceSchedule",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.maintenanceSchedule.update"
+        ],
+        "referencedVariables": [
+          "updateMaintenanceSchedule",
+          "id",
+          "data",
+          "Prisma",
+          "MaintenanceScheduleUncheckedUpdateInput",
+          "prisma",
+          "maintenanceSchedule",
+          "update",
+          "where"
+        ],
+        "signature": "export async function updateMaintenanceSchedule(id: string, data: Prisma.MaintenanceScheduleUncheckedUpdateInput) {\r\n  return prisma.maintenanceSchedule.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}",
+        "snippet": "export async function updateMaintenanceSchedule(id: string, data: Prisma.MaintenanceScheduleUncheckedUpdateInput) {\r\n  return prisma.maintenanceSchedule.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}"
+      },
+      {
+        "name": "deleteMaintenanceSchedule",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.maintenanceSchedule.update"
+        ],
+        "referencedVariables": [
+          "deleteMaintenanceSchedule",
+          "id",
+          "prisma",
+          "maintenanceSchedule",
+          "update",
+          "where",
+          "data",
+          "deletedAt",
+          "Date"
+        ],
+        "signature": "export async function deleteMaintenanceSchedule(id: string) {\r\n  return prisma.maintenanceSchedule.update({\r\n    where: { id },\r\n    data: { deletedAt: new Date() },\r\n  });\r\n}",
+        "snippet": "export async function deleteMaintenanceSchedule(id: string) {\r\n  return prisma.maintenanceSchedule.update({\r\n    where: { id },\r\n    data: { deletedAt: new Date() },\r\n  });\r\n}"
+      },
+      {
+        "name": "getMaintenanceSchedule",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.maintenanceSchedule.findUnique"
+        ],
+        "referencedVariables": [
+          "getMaintenanceSchedule",
+          "id",
+          "prisma",
+          "maintenanceSchedule",
+          "findUnique",
+          "where",
+          "include",
+          "meter",
+          "assignments",
+          "assets"
+        ],
+        "signature": "export async function getMaintenanceSchedule(id: string) {\r\n  return prisma.maintenanceSchedule.findUnique({\r\n    where: { id },\r\n    include: { meter: true, assignments: true, assets: true },\r\n  });\r\n}",
+        "snippet": "export async function getMaintenanceSchedule(id: string) {\r\n  return prisma.maintenanceSchedule.findUnique({\r\n    where: { id },\r\n    include: { meter: true, assignments: true, assets: true },\r\n  });\r\n}"
+      },
+      {
+        "name": "getMaintenanceSchedules",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "Promise.all",
+          "prisma.maintenanceSchedule.findMany",
+          "prisma.maintenanceSchedule.count"
+        ],
+        "referencedVariables": [
+          "getMaintenanceSchedules",
+          "tenantId",
+          "skip",
+          "take",
+          "schedules",
+          "total",
+          "Promise",
+          "all",
+          "prisma",
+          "maintenanceSchedule",
+          "findMany",
+          "where",
+          "deletedAt",
+          "include",
+          "meter",
+          "count"
+        ],
+        "signature": "export async function getMaintenanceSchedules({\r\n  tenantId,\r\n  skip = 0,\r\n  take = 10,\r\n}: {\r\n  tenantId: string;\r\n  skip?: number;\r\n  take?: number;\r\n}) {\r\n  const [schedules, total] = await Promise.all([\r\n    prisma.maintenanceSchedule.findMany({\r\n      where: { tenantId, deletedAt: null },\r\n      include: { meter: true },\r\n      skip,\r\n      take,\r\n    }),\r\n    prisma.maintenanceSchedule.count({ where: { tenantId, deletedAt: null } }),\r\n  ]);\r\n  return { schedules, total };\r\n}",
+        "snippet": "export async function getMaintenanceSchedules({\r\n  tenantId,\r\n  skip = 0,\r\n  take = 10,\r\n}: {\r\n  tenantId: string;\r\n  skip?: number;\r\n  take?: number;\r\n}) {\r\n  const [schedules, total] = await Promise.all([\r\n    prisma.maintenanceSchedule.findMany({\r\n      where: { tenantId, deletedAt: null },\r\n      include: { meter: true },\r\n      skip,\r\n      take,\r\n    }),\r\n    prisma.maintenanceSchedule.count({ where: { tenantId, deletedAt: null } }),\r\n  ]);\r\n  return { schedules, total };\r\n}"
+      },
+      {
+        "name": "createMaintenanceAssignment",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// MaintenanceAssignment"
+        ],
+        "calledFunctions": [
+          "prisma.maintenanceAssignment.create"
+        ],
+        "referencedVariables": [
+          "createMaintenanceAssignment",
+          "data",
+          "Prisma",
+          "MaintenanceAssignmentCreateInput",
+          "prisma",
+          "maintenanceAssignment",
+          "create"
+        ],
+        "signature": "export async function createMaintenanceAssignment(data: Prisma.MaintenanceAssignmentCreateInput) {\r\n  return prisma.maintenanceAssignment.create({ data });\r\n}",
+        "snippet": "export async function createMaintenanceAssignment(data: Prisma.MaintenanceAssignmentCreateInput) {\r\n  return prisma.maintenanceAssignment.create({ data });\r\n}"
+      },
+      {
+        "name": "deleteMaintenanceAssignment",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.maintenanceAssignment.delete"
+        ],
+        "referencedVariables": [
+          "deleteMaintenanceAssignment",
+          "maintenanceId",
+          "userId",
+          "prisma",
+          "maintenanceAssignment",
+          "delete",
+          "where",
+          "maintenanceId_userId"
+        ],
+        "signature": "export async function deleteMaintenanceAssignment(maintenanceId: string, userId: string) {\r\n  return prisma.maintenanceAssignment.delete({\r\n    where: { maintenanceId_userId: { maintenanceId, userId } },\r\n  });\r\n}",
+        "snippet": "export async function deleteMaintenanceAssignment(maintenanceId: string, userId: string) {\r\n  return prisma.maintenanceAssignment.delete({\r\n    where: { maintenanceId_userId: { maintenanceId, userId } },\r\n  });\r\n}"
+      },
+      {
+        "name": "createMaintenanceAsset",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// MaintenanceAssets"
+        ],
+        "calledFunctions": [
+          "prisma.maintenanceAssets.create"
+        ],
+        "referencedVariables": [
+          "createMaintenanceAsset",
+          "data",
+          "Prisma",
+          "MaintenanceAssetsCreateInput",
+          "prisma",
+          "maintenanceAssets",
+          "create"
+        ],
+        "signature": "export async function createMaintenanceAsset(data: Prisma.MaintenanceAssetsCreateInput) {\r\n  return prisma.maintenanceAssets.create({ data });\r\n}",
+        "snippet": "export async function createMaintenanceAsset(data: Prisma.MaintenanceAssetsCreateInput) {\r\n  return prisma.maintenanceAssets.create({ data });\r\n}"
+      },
+      {
+        "name": "deleteMaintenanceAsset",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.maintenanceAssets.delete"
+        ],
+        "referencedVariables": [
+          "deleteMaintenanceAsset",
+          "maintenanceId",
+          "assetId",
+          "prisma",
+          "maintenanceAssets",
+          "delete",
+          "where",
+          "maintenanceId_assetId"
+        ],
+        "signature": "export async function deleteMaintenanceAsset(maintenanceId: string, assetId: string) {\r\n  return prisma.maintenanceAssets.delete({\r\n    where: { maintenanceId_assetId: { maintenanceId, assetId } },\r\n  });\r\n}",
+        "snippet": "export async function deleteMaintenanceAsset(maintenanceId: string, assetId: string) {\r\n  return prisma.maintenanceAssets.delete({\r\n    where: { maintenanceId_assetId: { maintenanceId, assetId } },\r\n  });\r\n}"
+      },
+      {
+        "name": "createMeter",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// Meter"
+        ],
+        "calledFunctions": [
+          "prisma.meter.create"
+        ],
+        "referencedVariables": [
+          "createMeter",
+          "data",
+          "Prisma",
+          "MeterCreateInput",
+          "prisma",
+          "meter",
+          "create"
+        ],
+        "signature": "export async function createMeter(data: Prisma.MeterCreateInput) {\r\n  return prisma.meter.create({ data });\r\n}",
+        "snippet": "export async function createMeter(data: Prisma.MeterCreateInput) {\r\n  return prisma.meter.create({ data });\r\n}"
+      },
+      {
+        "name": "updateMeter",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.meter.update"
+        ],
+        "referencedVariables": [
+          "updateMeter",
+          "id",
+          "data",
+          "Prisma",
+          "MeterUpdateInput",
+          "prisma",
+          "meter",
+          "update",
+          "where"
+        ],
+        "signature": "export async function updateMeter(id: string, data: Prisma.MeterUpdateInput) {\r\n  return prisma.meter.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}",
+        "snippet": "export async function updateMeter(id: string, data: Prisma.MeterUpdateInput) {\r\n  return prisma.meter.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}"
+      },
+      {
+        "name": "getMeters",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.meter.findMany"
+        ],
+        "referencedVariables": [
+          "getMeters",
+          "tenantId",
+          "prisma",
+          "meter",
+          "findMany",
+          "where"
+        ],
+        "signature": "export async function getMeters(tenantId: string) {\r\n  return prisma.meter.findMany({\r\n    where: { tenantId },\r\n  });\r\n}",
+        "snippet": "export async function getMeters(tenantId: string) {\r\n  return prisma.meter.findMany({\r\n    where: { tenantId },\r\n  });\r\n}"
+      },
+      {
+        "name": "createVendor",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// Vendor"
+        ],
+        "calledFunctions": [
+          "prisma.vendor.create"
+        ],
+        "referencedVariables": [
+          "createVendor",
+          "data",
+          "Prisma",
+          "VendorUncheckedCreateInput",
+          "prisma",
+          "vendor",
+          "create"
+        ],
+        "signature": "export async function createVendor(data: Prisma.VendorUncheckedCreateInput) {\r\n  return prisma.vendor.create({ data });\r\n}",
+        "snippet": "export async function createVendor(data: Prisma.VendorUncheckedCreateInput) {\r\n  return prisma.vendor.create({ data });\r\n}"
+      },
+      {
+        "name": "updateVendor",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.vendor.update"
+        ],
+        "referencedVariables": [
+          "updateVendor",
+          "id",
+          "data",
+          "Prisma",
+          "VendorUpdateInput",
+          "prisma",
+          "vendor",
+          "update",
+          "where"
+        ],
+        "signature": "export async function updateVendor(id: string, data: Prisma.VendorUpdateInput) {\r\n  return prisma.vendor.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}",
+        "snippet": "export async function updateVendor(id: string, data: Prisma.VendorUpdateInput) {\r\n  return prisma.vendor.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}"
+      },
+      {
+        "name": "deleteVendor",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.vendor.update"
+        ],
+        "referencedVariables": [
+          "deleteVendor",
+          "id",
+          "prisma",
+          "vendor",
+          "update",
+          "where",
+          "data",
+          "deletedAt",
+          "Date"
+        ],
+        "signature": "export async function deleteVendor(id: string) {\r\n  return prisma.vendor.update({\r\n    where: { id },\r\n    data: { deletedAt: new Date() },\r\n  });\r\n}",
+        "snippet": "export async function deleteVendor(id: string) {\r\n  return prisma.vendor.update({\r\n    where: { id },\r\n    data: { deletedAt: new Date() },\r\n  });\r\n}"
+      },
+      {
+        "name": "getVendor",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.vendor.findUnique"
+        ],
+        "referencedVariables": [
+          "getVendor",
+          "id",
+          "prisma",
+          "vendor",
+          "findUnique",
+          "where",
+          "include",
+          "parts"
+        ],
+        "signature": "export async function getVendor(id: string) {\r\n  return prisma.vendor.findUnique({\r\n    where: { id },\r\n    include: { parts: true },\r\n  });\r\n}",
+        "snippet": "export async function getVendor(id: string) {\r\n  return prisma.vendor.findUnique({\r\n    where: { id },\r\n    include: { parts: true },\r\n  });\r\n}"
+      },
+      {
+        "name": "getVendorTenantId",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.vendor.findFirst"
+        ],
+        "referencedVariables": [
+          "getVendorTenantId",
+          "tenantId",
+          "prisma",
+          "vendor",
+          "findFirst",
+          "where",
+          "include",
+          "parts"
+        ],
+        "signature": "export async function getVendorTenantId(tenantId: string) {\r\n    return prisma.vendor.findFirst({\r\n      where: { tenantId },\r\n      include: { parts: true },\r\n    });\r\n  }",
+        "snippet": "export async function getVendorTenantId(tenantId: string) {\r\n    return prisma.vendor.findFirst({\r\n      where: { tenantId },\r\n      include: { parts: true },\r\n    });\r\n  }"
+      },
+      {
+        "name": "getVendors",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "Promise.all",
+          "prisma.vendor.findMany",
+          "prisma.vendor.count"
+        ],
+        "referencedVariables": [
+          "getVendors",
+          "tenantId",
+          "skip",
+          "take",
+          "vendors",
+          "total",
+          "Promise",
+          "all",
+          "prisma",
+          "vendor",
+          "findMany",
+          "where",
+          "deletedAt",
+          "count"
+        ],
+        "signature": "export async function getVendors({\r\n  tenantId,\r\n  skip = 0,\r\n  take = 10,\r\n}: {\r\n  tenantId: string;\r\n  skip?: number;\r\n  take?: number;\r\n}) {\r\n  const [vendors, total] = await Promise.all([\r\n    prisma.vendor.findMany({\r\n      where: { tenantId, deletedAt: null },\r\n      skip,\r\n      take,\r\n    }),\r\n    prisma.vendor.count({ where: { tenantId, deletedAt: null } }),\r\n  ]);\r\n  return { vendors, total };\r\n}",
+        "snippet": "export async function getVendors({\r\n  tenantId,\r\n  skip = 0,\r\n  take = 10,\r\n}: {\r\n  tenantId: string;\r\n  skip?: number;\r\n  take?: number;\r\n}) {\r\n  const [vendors, total] = await Promise.all([\r\n    prisma.vendor.findMany({\r\n      where: { tenantId, deletedAt: null },\r\n      skip,\r\n      take,\r\n    }),\r\n    prisma.vendor.count({ where: { tenantId, deletedAt: null } }),\r\n  ]);\r\n  return { vendors, total };\r\n}"
+      },
+      {
+        "name": "createPartVendor",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// PartVendor"
+        ],
+        "calledFunctions": [
+          "prisma.partVendor.create"
+        ],
+        "referencedVariables": [
+          "createPartVendor",
+          "data",
+          "Prisma",
+          "PartVendorCreateInput",
+          "prisma",
+          "partVendor",
+          "create"
+        ],
+        "signature": "export async function createPartVendor(data: Prisma.PartVendorCreateInput) {\r\n  return prisma.partVendor.create({ data });\r\n}",
+        "snippet": "export async function createPartVendor(data: Prisma.PartVendorCreateInput) {\r\n  return prisma.partVendor.create({ data });\r\n}"
+      },
+      {
+        "name": "deletePartVendor",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.partVendor.delete"
+        ],
+        "referencedVariables": [
+          "deletePartVendor",
+          "partId",
+          "vendorId",
+          "prisma",
+          "partVendor",
+          "delete",
+          "where",
+          "partId_vendorId"
+        ],
+        "signature": "export async function deletePartVendor(partId: string, vendorId: string) {\r\n  return prisma.partVendor.delete({\r\n    where: { partId_vendorId: { partId, vendorId } },\r\n  });\r\n}",
+        "snippet": "export async function deletePartVendor(partId: string, vendorId: string) {\r\n  return prisma.partVendor.delete({\r\n    where: { partId_vendorId: { partId, vendorId } },\r\n  });\r\n}"
+      },
+      {
+        "name": "createPart",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// Part"
+        ],
+        "calledFunctions": [
+          "prisma.part.create"
+        ],
+        "referencedVariables": [
+          "createPart",
+          "data",
+          "Prisma",
+          "PartUncheckedCreateInput",
+          "prisma",
+          "part",
+          "create"
+        ],
+        "signature": "export async function createPart(data: Prisma.PartUncheckedCreateInput) {\r\n  return prisma.part.create({ data });\r\n}",
+        "snippet": "export async function createPart(data: Prisma.PartUncheckedCreateInput) {\r\n  return prisma.part.create({ data });\r\n}"
+      },
+      {
+        "name": "updatePart",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.part.update"
+        ],
+        "referencedVariables": [
+          "updatePart",
+          "id",
+          "data",
+          "Prisma",
+          "PartUpdateInput",
+          "prisma",
+          "part",
+          "update",
+          "where"
+        ],
+        "signature": "export async function updatePart(id: string, data: Prisma.PartUpdateInput) {\r\n  return prisma.part.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}",
+        "snippet": "export async function updatePart(id: string, data: Prisma.PartUpdateInput) {\r\n  return prisma.part.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}"
+      },
+      {
+        "name": "deletePart",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.part.update"
+        ],
+        "referencedVariables": [
+          "deletePart",
+          "id",
+          "prisma",
+          "part",
+          "update",
+          "where",
+          "data",
+          "deletedAt",
+          "Date"
+        ],
+        "signature": "export async function deletePart(id: string) {\r\n  return prisma.part.update({\r\n    where: { id },\r\n    data: { deletedAt: new Date() },\r\n  });\r\n}",
+        "snippet": "export async function deletePart(id: string) {\r\n  return prisma.part.update({\r\n    where: { id },\r\n    data: { deletedAt: new Date() },\r\n  });\r\n}"
+      },
+      {
+        "name": "getPart",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.part.findUnique"
+        ],
+        "referencedVariables": [
+          "getPart",
+          "id",
+          "prisma",
+          "part",
+          "findUnique",
+          "where",
+          "include",
+          "vendors"
+        ],
+        "signature": "export async function getPart(id: string) {\r\n  return prisma.part.findUnique({\r\n    where: { id },\r\n    include: { vendors: true },\r\n  });\r\n}",
+        "snippet": "export async function getPart(id: string) {\r\n  return prisma.part.findUnique({\r\n    where: { id },\r\n    include: { vendors: true },\r\n  });\r\n}"
+      },
+      {
+        "name": "getParts",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "Promise.all",
+          "prisma.part.findMany",
+          "prisma.part.count"
+        ],
+        "referencedVariables": [
+          "getParts",
+          "tenantId",
+          "skip",
+          "take",
+          "parts",
+          "total",
+          "Promise",
+          "all",
+          "prisma",
+          "part",
+          "findMany",
+          "where",
+          "deletedAt",
+          "count"
+        ],
+        "signature": "export async function getParts({\r\n  tenantId,\r\n  skip = 0,\r\n  take = 10,\r\n}: {\r\n  tenantId: string;\r\n  skip?: number;\r\n  take?: number;\r\n}) {\r\n  const [parts, total] = await Promise.all([\r\n    prisma.part.findMany({\r\n      where: { tenantId, deletedAt: null },\r\n      skip,\r\n      take,\r\n    }),\r\n    prisma.part.count({ where: { tenantId, deletedAt: null } }),\r\n  ]);\r\n  return { parts, total };\r\n}",
+        "snippet": "export async function getParts({\r\n  tenantId,\r\n  skip = 0,\r\n  take = 10,\r\n}: {\r\n  tenantId: string;\r\n  skip?: number;\r\n  take?: number;\r\n}) {\r\n  const [parts, total] = await Promise.all([\r\n    prisma.part.findMany({\r\n      where: { tenantId, deletedAt: null },\r\n      skip,\r\n      take,\r\n    }),\r\n    prisma.part.count({ where: { tenantId, deletedAt: null } }),\r\n  ]);\r\n  return { parts, total };\r\n}"
+      },
+      {
+        "name": "createTenant",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// Tenant"
+        ],
+        "calledFunctions": [
+          "prisma.tenant.create"
+        ],
+        "referencedVariables": [
+          "createTenant",
+          "data",
+          "Prisma",
+          "TenantCreateInput",
+          "prisma",
+          "tenant",
+          "create"
+        ],
+        "signature": "export async function createTenant(data: Prisma.TenantCreateInput) {\r\n  return prisma.tenant.create({ data });\r\n}",
+        "snippet": "export async function createTenant(data: Prisma.TenantCreateInput) {\r\n  return prisma.tenant.create({ data });\r\n}"
+      },
+      {
+        "name": "updateTenant",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.tenant.update"
+        ],
+        "referencedVariables": [
+          "updateTenant",
+          "id",
+          "data",
+          "Prisma",
+          "TenantUncheckedUpdateInput",
+          "prisma",
+          "tenant",
+          "update",
+          "where"
+        ],
+        "signature": "export async function updateTenant(id: string, data: Prisma.TenantUncheckedUpdateInput) {\r\n  return prisma.tenant.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}",
+        "snippet": "export async function updateTenant(id: string, data: Prisma.TenantUncheckedUpdateInput) {\r\n  return prisma.tenant.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}"
+      },
+      {
+        "name": "deleteTenant",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.tenant.update"
+        ],
+        "referencedVariables": [
+          "deleteTenant",
+          "id",
+          "prisma",
+          "tenant",
+          "update",
+          "where",
+          "data",
+          "deletedAt",
+          "Date"
+        ],
+        "signature": "export async function deleteTenant(id: string) {\r\n  return prisma.tenant.update({\r\n    where: { id },\r\n    data: { deletedAt: new Date() },\r\n  });\r\n}",
+        "snippet": "export async function deleteTenant(id: string) {\r\n  return prisma.tenant.update({\r\n    where: { id },\r\n    data: { deletedAt: new Date() },\r\n  });\r\n}"
+      },
+      {
+        "name": "getTenant",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.tenant.findUnique"
+        ],
+        "referencedVariables": [
+          "getTenant",
+          "id",
+          "prisma",
+          "tenant",
+          "findUnique",
+          "where",
+          "include",
+          "settings",
+          "parent",
+          "children"
+        ],
+        "signature": "export async function getTenant(id: string) {\r\n  return prisma.tenant.findUnique({\r\n    where: { id },\r\n    include: { settings: true, parent: true, children: true },\r\n  });\r\n}",
+        "snippet": "export async function getTenant(id: string) {\r\n  return prisma.tenant.findUnique({\r\n    where: { id },\r\n    include: { settings: true, parent: true, children: true },\r\n  });\r\n}"
+      },
+      {
+        "name": "getTenantByName",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.tenant.findFirst"
+        ],
+        "referencedVariables": [
+          "getTenantByName",
+          "subdomain",
+          "prisma",
+          "tenant",
+          "findFirst",
+          "where",
+          "include",
+          "settings",
+          "parent",
+          "children"
+        ],
+        "signature": "export async function getTenantByName(subdomain: string) {\r\n    return prisma.tenant.findFirst({\r\n      where: { subdomain },\r\n      include: { settings: true, parent: true, children: true },\r\n    });\r\n  }",
+        "snippet": "export async function getTenantByName(subdomain: string) {\r\n    return prisma.tenant.findFirst({\r\n      where: { subdomain },\r\n      include: { settings: true, parent: true, children: true },\r\n    });\r\n  }"
+      },
+      {
+        "name": "getTenants",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "Promise.all",
+          "prisma.tenant.findMany",
+          "prisma.tenant.count"
+        ],
+        "referencedVariables": [
+          "getTenants",
+          "skip",
+          "take",
+          "tenants",
+          "total",
+          "Promise",
+          "all",
+          "prisma",
+          "tenant",
+          "findMany",
+          "where",
+          "deletedAt",
+          "include",
+          "settings",
+          "count"
+        ],
+        "signature": "export async function getTenants({\r\n  skip = 0,\r\n  take = 10,\r\n}: {\r\n  skip?: number;\r\n  take?: number;\r\n}) {\r\n  const [tenants, total] = await Promise.all([\r\n    prisma.tenant.findMany({\r\n      where: { deletedAt: null },\r\n      include: { settings: true },\r\n      skip,\r\n      take,\r\n    }),\r\n    prisma.tenant.count({ where: { deletedAt: null } }),\r\n  ]);\r\n  return { tenants, total };\r\n}",
+        "snippet": "export async function getTenants({\r\n  skip = 0,\r\n  take = 10,\r\n}: {\r\n  skip?: number;\r\n  take?: number;\r\n}) {\r\n  const [tenants, total] = await Promise.all([\r\n    prisma.tenant.findMany({\r\n      where: { deletedAt: null },\r\n      include: { settings: true },\r\n      skip,\r\n      take,\r\n    }),\r\n    prisma.tenant.count({ where: { deletedAt: null } }),\r\n  ]);\r\n  return { tenants, total };\r\n}"
+      },
+      {
+        "name": "createTenantSettings",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// TenantSettings"
+        ],
+        "calledFunctions": [
+          "prisma.tenantSettings.create"
+        ],
+        "referencedVariables": [
+          "createTenantSettings",
+          "data",
+          "Prisma",
+          "TenantSettingsCreateInput",
+          "prisma",
+          "tenantSettings",
+          "create"
+        ],
+        "signature": "export async function createTenantSettings(data: Prisma.TenantSettingsCreateInput) {\r\n  return prisma.tenantSettings.create({ data });\r\n}",
+        "snippet": "export async function createTenantSettings(data: Prisma.TenantSettingsCreateInput) {\r\n  return prisma.tenantSettings.create({ data });\r\n}"
+      },
+      {
+        "name": "updateTenantSettings",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.tenantSettings.update"
+        ],
+        "referencedVariables": [
+          "updateTenantSettings",
+          "tenantId",
+          "data",
+          "Prisma",
+          "TenantSettingsUpdateInput",
+          "prisma",
+          "tenantSettings",
+          "update",
+          "where"
+        ],
+        "signature": "export async function updateTenantSettings(tenantId: string, data: Prisma.TenantSettingsUpdateInput) {\r\n  return prisma.tenantSettings.update({\r\n    where: { tenantId },\r\n    data,\r\n  });\r\n}",
+        "snippet": "export async function updateTenantSettings(tenantId: string, data: Prisma.TenantSettingsUpdateInput) {\r\n  return prisma.tenantSettings.update({\r\n    where: { tenantId },\r\n    data,\r\n  });\r\n}"
+      },
+      {
+        "name": "createUser",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// User"
+        ],
+        "calledFunctions": [
+          "prisma.user.create"
+        ],
+        "referencedVariables": [
+          "createUser",
+          "data",
+          "Prisma",
+          "UserUncheckedCreateInput",
+          "prisma",
+          "user",
+          "create"
+        ],
+        "signature": "export async function createUser(data: Prisma.UserUncheckedCreateInput) {\r\n  return prisma.user.create({ data });\r\n}",
+        "snippet": "export async function createUser(data: Prisma.UserUncheckedCreateInput) {\r\n  return prisma.user.create({ data });\r\n}"
+      },
+      {
+        "name": "updateUser",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.user.update"
+        ],
+        "referencedVariables": [
+          "updateUser",
+          "id",
+          "data",
+          "Prisma",
+          "UserUpdateInput",
+          "prisma",
+          "user",
+          "update",
+          "where"
+        ],
+        "signature": "export async function updateUser(id: string, data: Prisma.UserUpdateInput) {\r\n  return prisma.user.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}",
+        "snippet": "export async function updateUser(id: string, data: Prisma.UserUpdateInput) {\r\n  return prisma.user.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}"
+      },
+      {
+        "name": "deleteUser",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.user.update"
+        ],
+        "referencedVariables": [
+          "deleteUser",
+          "id",
+          "prisma",
+          "user",
+          "update",
+          "where",
+          "data",
+          "deletedAt",
+          "Date"
+        ],
+        "signature": "export async function deleteUser(id: string) {\r\n  return prisma.user.update({\r\n    where: { id },\r\n    data: { deletedAt: new Date() },\r\n  });\r\n}",
+        "snippet": "export async function deleteUser(id: string) {\r\n  return prisma.user.update({\r\n    where: { id },\r\n    data: { deletedAt: new Date() },\r\n  });\r\n}"
+      },
+      {
+        "name": "getUser",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.user.findUnique"
+        ],
+        "referencedVariables": [
+          "getUser",
+          "id",
+          "prisma",
+          "user",
+          "findUnique",
+          "where",
+          "include",
+          "tenant"
+        ],
+        "signature": "export async function getUser(id: string) {\r\n  return prisma.user.findUnique({\r\n    where: { id },\r\n    include: { tenant: true },\r\n  });\r\n}",
+        "snippet": "export async function getUser(id: string) {\r\n  return prisma.user.findUnique({\r\n    where: { id },\r\n    include: { tenant: true },\r\n  });\r\n}"
+      },
+      {
+        "name": "getUsers",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "Promise.all",
+          "prisma.user.findMany",
+          "prisma.user.count"
+        ],
+        "referencedVariables": [
+          "getUsers",
+          "tenantId",
+          "skip",
+          "take",
+          "users",
+          "total",
+          "Promise",
+          "all",
+          "prisma",
+          "user",
+          "findMany",
+          "where",
+          "deletedAt",
+          "include",
+          "tenant",
+          "count"
+        ],
+        "signature": "export async function getUsers({\r\n  tenantId,\r\n  skip = 0,\r\n  take = 10,\r\n}: {\r\n  tenantId: string;\r\n  skip?: number;\r\n  take?: number;\r\n}) {\r\n  const [users, total] = await Promise.all([\r\n    prisma.user.findMany({\r\n      where: { tenantId, deletedAt: null },\r\n      include: { tenant: true },\r\n      skip,\r\n      take,\r\n    }),\r\n    prisma.user.count({ where: { tenantId, deletedAt: null } }),\r\n  ]);\r\n  return { users, total };\r\n}",
+        "snippet": "export async function getUsers({\r\n  tenantId,\r\n  skip = 0,\r\n  take = 10,\r\n}: {\r\n  tenantId: string;\r\n  skip?: number;\r\n  take?: number;\r\n}) {\r\n  const [users, total] = await Promise.all([\r\n    prisma.user.findMany({\r\n      where: { tenantId, deletedAt: null },\r\n      include: { tenant: true },\r\n      skip,\r\n      take,\r\n    }),\r\n    prisma.user.count({ where: { tenantId, deletedAt: null } }),\r\n  ]);\r\n  return { users, total };\r\n}"
+      },
+      {
+        "name": "createAccount",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// Account"
+        ],
+        "calledFunctions": [
+          "prisma.account.create"
+        ],
+        "referencedVariables": [
+          "createAccount",
+          "data",
+          "Prisma",
+          "AccountCreateInput",
+          "prisma",
+          "account",
+          "create"
+        ],
+        "signature": "export async function createAccount(data: Prisma.AccountCreateInput) {\r\n  return prisma.account.create({ data });\r\n}",
+        "snippet": "export async function createAccount(data: Prisma.AccountCreateInput) {\r\n  return prisma.account.create({ data });\r\n}"
+      },
+      {
+        "name": "createSession",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// Session"
+        ],
+        "calledFunctions": [
+          "prisma.session.create"
+        ],
+        "referencedVariables": [
+          "createSession",
+          "data",
+          "Prisma",
+          "SessionCreateInput",
+          "prisma",
+          "session",
+          "create"
+        ],
+        "signature": "export async function createSession(data: Prisma.SessionCreateInput) {\r\n  return prisma.session.create({ data });\r\n}",
+        "snippet": "export async function createSession(data: Prisma.SessionCreateInput) {\r\n  return prisma.session.create({ data });\r\n}"
+      },
+      {
+        "name": "deleteSession",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.session.delete"
+        ],
+        "referencedVariables": [
+          "deleteSession",
+          "sessionToken",
+          "prisma",
+          "session",
+          "delete",
+          "where"
+        ],
+        "signature": "export async function deleteSession(sessionToken: string) {\r\n  return prisma.session.delete({\r\n    where: { sessionToken },\r\n  });\r\n}",
+        "snippet": "export async function deleteSession(sessionToken: string) {\r\n  return prisma.session.delete({\r\n    where: { sessionToken },\r\n  });\r\n}"
+      },
+      {
+        "name": "createVerificationToken",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// VerificationToken"
+        ],
+        "calledFunctions": [
+          "prisma.verificationToken.create"
+        ],
+        "referencedVariables": [
+          "createVerificationToken",
+          "data",
+          "Prisma",
+          "VerificationTokenCreateInput",
+          "prisma",
+          "verificationToken",
+          "create"
+        ],
+        "signature": "export async function createVerificationToken(data: Prisma.VerificationTokenCreateInput) {\r\n  return prisma.verificationToken.create({ data });\r\n}",
+        "snippet": "export async function createVerificationToken(data: Prisma.VerificationTokenCreateInput) {\r\n  return prisma.verificationToken.create({ data });\r\n}"
+      },
+      {
+        "name": "createWorkOrder",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// WorkOrder"
+        ],
+        "calledFunctions": [
+          "prisma.workOrder.create"
+        ],
+        "referencedVariables": [
+          "createWorkOrder",
+          "data",
+          "Prisma",
+          "WorkOrderUncheckedCreateInput",
+          "prisma",
+          "workOrder",
+          "create"
+        ],
+        "signature": "export async function createWorkOrder(data: Prisma.WorkOrderUncheckedCreateInput) {\r\n  return prisma.workOrder.create({ data });\r\n}",
+        "snippet": "export async function createWorkOrder(data: Prisma.WorkOrderUncheckedCreateInput) {\r\n  return prisma.workOrder.create({ data });\r\n}"
+      },
+      {
+        "name": "updateWorkOrder",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.workOrder.update"
+        ],
+        "referencedVariables": [
+          "updateWorkOrder",
+          "id",
+          "data",
+          "Prisma",
+          "WorkOrderUncheckedUpdateInput",
+          "prisma",
+          "workOrder",
+          "update",
+          "where"
+        ],
+        "signature": "export async function updateWorkOrder(id: string, data: Prisma.WorkOrderUncheckedUpdateInput) {\r\n  return prisma.workOrder.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}",
+        "snippet": "export async function updateWorkOrder(id: string, data: Prisma.WorkOrderUncheckedUpdateInput) {\r\n  return prisma.workOrder.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}"
+      },
+      {
+        "name": "deleteWorkOrder",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.workOrderAssets.deleteMany",
+          "prisma.workOrderParts.deleteMany",
+          "prisma.workOrder.update"
+        ],
+        "referencedVariables": [
+          "deleteWorkOrder",
+          "id",
+          "prisma",
+          "workOrderAssets",
+          "deleteMany",
+          "where",
+          "workOrderId",
+          "workOrderParts",
+          "workOrder",
+          "update",
+          "data",
+          "deletedAt",
+          "Date"
+        ],
+        "signature": "export async function deleteWorkOrder(id: string) {\r\n  await prisma.workOrderAssets.deleteMany({ where: { workOrderId: id } });\r\n  await prisma.workOrderParts.deleteMany({ where: { workOrderId: id } });\r\n  return prisma.workOrder.update({\r\n    where: { id },\r\n    data: { deletedAt: new Date() },\r\n  });\r\n}",
+        "snippet": "export async function deleteWorkOrder(id: string) {\r\n  await prisma.workOrderAssets.deleteMany({ where: { workOrderId: id } });\r\n  await prisma.workOrderParts.deleteMany({ where: { workOrderId: id } });\r\n  return prisma.workOrder.update({\r\n    where: { id },\r\n    data: { deletedAt: new Date() },\r\n  });\r\n}"
+      },
+      {
+        "name": "getWorkOrder",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.workOrder.findUnique"
+        ],
+        "referencedVariables": [
+          "getWorkOrder",
+          "id",
+          "prisma",
+          "workOrder",
+          "findUnique",
+          "where",
+          "include",
+          "maintenance",
+          "assets",
+          "asset",
+          "parts",
+          "part",
+          "labor",
+          "logs",
+          "assignments"
+        ],
+        "signature": "export async function getWorkOrder(id: string) {\r\n  return prisma.workOrder.findUnique({\r\n    where: { id },\r\n    include: {\r\n      maintenance: true,\r\n      assets: { include: { asset: true } },\r\n      parts: { include: { part: true } },\r\n      labor: true,\r\n      logs: true,\r\n      assignments: true,\r\n    },\r\n  });\r\n}",
+        "snippet": "export async function getWorkOrder(id: string) {\r\n  return prisma.workOrder.findUnique({\r\n    where: { id },\r\n    include: {\r\n      maintenance: true,\r\n      assets: { include: { asset: true } },\r\n      parts: { include: { part: true } },\r\n      labor: true,\r\n      logs: true,\r\n      assignments: true,\r\n    },\r\n  });\r\n}"
+      },
+      {
+        "name": "getWorkOrders",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "Promise.all",
+          "prisma.workOrder.findMany",
+          "prisma.workOrder.count"
+        ],
+        "referencedVariables": [
+          "getWorkOrders",
+          "tenantId",
+          "skip",
+          "take",
+          "workOrders",
+          "total",
+          "Promise",
+          "all",
+          "prisma",
+          "workOrder",
+          "findMany",
+          "where",
+          "deletedAt",
+          "include",
+          "assets",
+          "asset",
+          "maintenance",
+          "count"
+        ],
+        "signature": "export async function getWorkOrders({\r\n  tenantId,\r\n  skip = 0,\r\n  take = 10,\r\n}: {\r\n  tenantId: string;\r\n  skip?: number;\r\n  take?: number;\r\n}) {\r\n  const [workOrders, total] = await Promise.all([\r\n    prisma.workOrder.findMany({\r\n      where: { tenantId, deletedAt: null },\r\n      include: { assets: { include: { asset: true } }, maintenance: true },\r\n      skip,\r\n      take,\r\n    }),\r\n    prisma.workOrder.count({ where: { tenantId, deletedAt: null } }),\r\n  ]);\r\n  return { workOrders, total };\r\n}",
+        "snippet": "export async function getWorkOrders({\r\n  tenantId,\r\n  skip = 0,\r\n  take = 10,\r\n}: {\r\n  tenantId: string;\r\n  skip?: number;\r\n  take?: number;\r\n}) {\r\n  const [workOrders, total] = await Promise.all([\r\n    prisma.workOrder.findMany({\r\n      where: { tenantId, deletedAt: null },\r\n      include: { assets: { include: { asset: true } }, maintenance: true },\r\n      skip,\r\n      take,\r\n    }),\r\n    prisma.workOrder.count({ where: { tenantId, deletedAt: null } }),\r\n  ]);\r\n  return { workOrders, total };\r\n}"
+      },
+      {
+        "name": "createWorkOrderAssignment",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// WorkOrderAssignment"
+        ],
+        "calledFunctions": [
+          "prisma.workOrderAssignment.create"
+        ],
+        "referencedVariables": [
+          "createWorkOrderAssignment",
+          "data",
+          "Prisma",
+          "WorkOrderAssignmentCreateInput",
+          "prisma",
+          "workOrderAssignment",
+          "create"
+        ],
+        "signature": "export async function createWorkOrderAssignment(data: Prisma.WorkOrderAssignmentCreateInput) {\r\n  return prisma.workOrderAssignment.create({ data });\r\n}",
+        "snippet": "export async function createWorkOrderAssignment(data: Prisma.WorkOrderAssignmentCreateInput) {\r\n  return prisma.workOrderAssignment.create({ data });\r\n}"
+      },
+      {
+        "name": "deleteWorkOrderAssignment",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.workOrderAssignment.delete"
+        ],
+        "referencedVariables": [
+          "deleteWorkOrderAssignment",
+          "workOrderId",
+          "userId",
+          "prisma",
+          "workOrderAssignment",
+          "delete",
+          "where",
+          "workOrderId_userId"
+        ],
+        "signature": "export async function deleteWorkOrderAssignment(workOrderId: string, userId: string) {\r\n  return prisma.workOrderAssignment.delete({\r\n    where: { workOrderId_userId: { workOrderId, userId } },\r\n  });\r\n}",
+        "snippet": "export async function deleteWorkOrderAssignment(workOrderId: string, userId: string) {\r\n  return prisma.workOrderAssignment.delete({\r\n    where: { workOrderId_userId: { workOrderId, userId } },\r\n  });\r\n}"
+      },
+      {
+        "name": "createWorkOrderAsset",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// WorkOrderAssets"
+        ],
+        "calledFunctions": [
+          "prisma.workOrderAssets.create"
+        ],
+        "referencedVariables": [
+          "createWorkOrderAsset",
+          "data",
+          "Prisma",
+          "WorkOrderAssetsCreateInput",
+          "prisma",
+          "workOrderAssets",
+          "create"
+        ],
+        "signature": "export async function createWorkOrderAsset(data: Prisma.WorkOrderAssetsCreateInput) {\r\n  return prisma.workOrderAssets.create({ data });\r\n}",
+        "snippet": "export async function createWorkOrderAsset(data: Prisma.WorkOrderAssetsCreateInput) {\r\n  return prisma.workOrderAssets.create({ data });\r\n}"
+      },
+      {
+        "name": "deleteWorkOrderAsset",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.workOrderAssets.delete"
+        ],
+        "referencedVariables": [
+          "deleteWorkOrderAsset",
+          "workOrderId",
+          "assetId",
+          "prisma",
+          "workOrderAssets",
+          "delete",
+          "where",
+          "workOrderId_assetId"
+        ],
+        "signature": "export async function deleteWorkOrderAsset(workOrderId: string, assetId: string) {\r\n  return prisma.workOrderAssets.delete({\r\n    where: { workOrderId_assetId: { workOrderId, assetId } },\r\n  });\r\n}",
+        "snippet": "export async function deleteWorkOrderAsset(workOrderId: string, assetId: string) {\r\n  return prisma.workOrderAssets.delete({\r\n    where: { workOrderId_assetId: { workOrderId, assetId } },\r\n  });\r\n}"
+      },
+      {
+        "name": "createWorkOrderPart",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// WorkOrderParts"
+        ],
+        "calledFunctions": [
+          "prisma.workOrderParts.create"
+        ],
+        "referencedVariables": [
+          "createWorkOrderPart",
+          "data",
+          "Prisma",
+          "WorkOrderPartsCreateInput",
+          "prisma",
+          "workOrderParts",
+          "create"
+        ],
+        "signature": "export async function createWorkOrderPart(data: Prisma.WorkOrderPartsCreateInput) {\r\n    return prisma.workOrderParts.create({ data });\r\n  }",
+        "snippet": "export async function createWorkOrderPart(data: Prisma.WorkOrderPartsCreateInput) {\r\n    return prisma.workOrderParts.create({ data });\r\n  }"
+      },
+      {
+        "name": "deleteWorkOrderPart",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.workOrderParts.delete"
+        ],
+        "referencedVariables": [
+          "deleteWorkOrderPart",
+          "workOrderId",
+          "partId",
+          "prisma",
+          "workOrderParts",
+          "delete",
+          "where",
+          "workOrderId_partId"
+        ],
+        "signature": "export async function deleteWorkOrderPart(workOrderId: string, partId: string) {\r\n    return prisma.workOrderParts.delete({\r\n      where: { workOrderId_partId: { workOrderId, partId } },\r\n    });\r\n  }",
+        "snippet": "export async function deleteWorkOrderPart(workOrderId: string, partId: string) {\r\n    return prisma.workOrderParts.delete({\r\n      where: { workOrderId_partId: { workOrderId, partId } },\r\n    });\r\n  }"
+      },
+      {
+        "name": "createWorkOrderLabor",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// WorkOrderLabor"
+        ],
+        "calledFunctions": [
+          "prisma.workOrderLabor.create"
+        ],
+        "referencedVariables": [
+          "createWorkOrderLabor",
+          "data",
+          "Prisma",
+          "WorkOrderLaborCreateInput",
+          "prisma",
+          "workOrderLabor",
+          "create"
+        ],
+        "signature": "export async function createWorkOrderLabor(data: Prisma.WorkOrderLaborCreateInput) {\r\n  return prisma.workOrderLabor.create({ data });\r\n}",
+        "snippet": "export async function createWorkOrderLabor(data: Prisma.WorkOrderLaborCreateInput) {\r\n  return prisma.workOrderLabor.create({ data });\r\n}"
+      },
+      {
+        "name": "updateWorkOrderLabor",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.workOrderLabor.update"
+        ],
+        "referencedVariables": [
+          "updateWorkOrderLabor",
+          "id",
+          "data",
+          "Prisma",
+          "WorkOrderLaborUpdateInput",
+          "prisma",
+          "workOrderLabor",
+          "update",
+          "where"
+        ],
+        "signature": "export async function updateWorkOrderLabor(id: string, data: Prisma.WorkOrderLaborUpdateInput) {\r\n  return prisma.workOrderLabor.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}",
+        "snippet": "export async function updateWorkOrderLabor(id: string, data: Prisma.WorkOrderLaborUpdateInput) {\r\n  return prisma.workOrderLabor.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}"
+      },
+      {
+        "name": "createWorkOrderLog",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// WorkOrderLog"
+        ],
+        "calledFunctions": [
+          "prisma.workOrderLog.create"
+        ],
+        "referencedVariables": [
+          "createWorkOrderLog",
+          "data",
+          "Prisma",
+          "WorkOrderLogCreateInput",
+          "prisma",
+          "workOrderLog",
+          "create"
+        ],
+        "signature": "export async function createWorkOrderLog(data: Prisma.WorkOrderLogCreateInput) {\r\n  return prisma.workOrderLog.create({ data });\r\n}",
+        "snippet": "export async function createWorkOrderLog(data: Prisma.WorkOrderLogCreateInput) {\r\n  return prisma.workOrderLog.create({ data });\r\n}"
+      }
+    ]
+  },
+  {
+    "filePath": "E:/Dev/websites/repairradar-v0.1/src/hooks/useTenantData.ts",
+    "exports": [
+      {
+        "name": "useTenantData",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "useQuery",
+          "fetchTenantData",
+          "data.parts.filter",
+          "data.workOrders.filter",
+          "['PENDING', 'IN_PROGRESS'].includes",
+          "data.incidents.filter",
+          "CallStatus.OPEN.includes",
+          "data.assets.filter",
+          "AssetStatus.OPERATIONAL.includes"
+        ],
+        "referencedVariables": [
+          "useTenantData",
+          "subdomain",
+          "useQuery",
+          "queryKey",
+          "queryFn",
+          "fetchTenantData",
+          "staleTime",
+          "gcTime",
+          "select",
+          "data",
+          "TenantWithRelations",
+          "lowStockParts",
+          "parts",
+          "filter",
+          "p",
+          "quantity",
+          "minStock",
+          "activeWorkOrders",
+          "workOrders",
+          "wo",
+          "includes",
+          "status",
+          "activeCalls",
+          "incidents",
+          "c",
+          "CallStatus",
+          "OPEN",
+          "assetsDown",
+          "assets",
+          "a",
+          "AssetStatus",
+          "OPERATIONAL"
+        ],
+        "signature": "export function useTenantData(subdomain: string) {\r\n  return useQuery({\r\n    queryKey: ['tenant', subdomain, 'dashboard'],\r\n    queryFn: () => fetchTenantData(subdomain),\r\n    staleTime: 5 * 60 * 1000, // 5 minutes\r\n    gcTime: 10 * 60 * 1000, // 10 minutes\r\n    select: (data: TenantWithRelations) => ({\r\n      ...data,\r\n      lowStockParts: data.parts.filter(p => p.quantity <= p.minStock),\r\n      activeWorkOrders: data.workOrders.filter(wo => \r\n        ['PENDING', 'IN_PROGRESS'].includes(wo.status)\r\n      ),\r\n      activeCalls: data.incidents.filter(c => CallStatus.OPEN.includes(c.status)),\r\n      assetsDown: data.assets.filter(a => !AssetStatus.OPERATIONAL.includes(a.status)),\r\n    }),\r\n  });\r\n}",
+        "snippet": "export function useTenantData(subdomain: string) {\r\n  return useQuery({\r\n    queryKey: ['tenant', subdomain, 'dashboard'],\r\n    queryFn: () => fetchTenantData(subdomain),\r\n    staleTime: 5 * 60 * 1000, // 5 minutes\r\n    gcTime: 10 * 60 * 1000, // 10 minutes\r\n    select: (data: TenantWithRelations) => ({\r\n      ...data,\r\n      lowStockParts: data.parts.filter(p => p.quantity <= p.minStock),\r\n      activeWorkOrders: data.workOrders.filter(wo => \r\n        ['PENDING', 'IN_PROGRESS'].includes(wo.status)\r\n      ),\r\n      activeCalls: data.incidents.filter(c => CallStatus.OPEN.includes(c.status)),\r\n      assetsDown: data.assets.filter(a => !AssetStatus.OPERATIONAL.includes(a.status)),\r\n    }),\r\n  });\r\n}"
+      }
+    ]
+  },
+  {
+    "filePath": "E:/Dev/websites/repairradar-v0.1/src/lib/auth-utils.ts",
+    "exports": [
+      {
+        "name": "hashPassword",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "bcrypt.hash"
+        ],
+        "referencedVariables": [
+          "hashPassword",
+          "password",
+          "bcrypt",
+          "hash"
+        ],
+        "signature": "export async function hashPassword(password: string) {\r\n  return await bcrypt.hash(password, 12);\r\n}",
+        "snippet": "export async function hashPassword(password: string) {\r\n  return await bcrypt.hash(password, 12);\r\n}"
+      },
+      {
+        "name": "verifyPassword",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "bcrypt.compare"
+        ],
+        "referencedVariables": [
+          "verifyPassword",
+          "password",
+          "hashedPassword",
+          "bcrypt",
+          "compare"
+        ],
+        "signature": "export async function verifyPassword(password: string, hashedPassword: string) {\r\n  return await bcrypt.compare(password, hashedPassword);\r\n}",
+        "snippet": "export async function verifyPassword(password: string, hashedPassword: string) {\r\n  return await bcrypt.compare(password, hashedPassword);\r\n}"
+      }
+    ]
+  },
+  {
+    "filePath": "E:/Dev/websites/repairradar-v0.1/src/lib/auth.ts",
+    "exports": [
+      {
+        "name": "getCurrentUser",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "getServerSession"
+        ],
+        "referencedVariables": [
+          "getCurrentUser",
+          "session",
+          "getServerSession",
+          "authOptions",
+          "user"
+        ],
+        "signature": "export async function getCurrentUser() {\r\n  const session = await getServerSession(authOptions);\r\n  return session?.user;\r\n}",
+        "snippet": "export async function getCurrentUser() {\r\n  const session = await getServerSession(authOptions);\r\n  return session?.user;\r\n}"
+      },
+      {
+        "name": "requireAuth",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "getServerSession",
+          "console.log"
+        ],
+        "referencedVariables": [
+          "requireAuth",
+          "session",
+          "getServerSession",
+          "authOptions",
+          "console",
+          "log",
+          "user",
+          "Error"
+        ],
+        "signature": "export async function requireAuth() {\r\n  const session = await getServerSession(authOptions);\r\n  console.log(session?.user);\r\n  if (!session) {\r\n    throw new Error(\"Authentication required\");\r\n\r\n  }\r\n  return session;\r\n}",
+        "snippet": "export async function requireAuth() {\r\n  const session = await getServerSession(authOptions);\r\n  console.log(session?.user);\r\n  if (!session) {\r\n    throw new Error(\"Authentication required\");\r\n\r\n  }\r\n  return session;\r\n}"
+      }
+    ]
+  },
+  {
+    "filePath": "E:/Dev/websites/repairradar-v0.1/src/lib/middleware.ts",
+    "exports": [
+      {
+        "name": "middleware",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "pathname.split",
+          "request.cookies.get",
+          "console.log",
+          "NextResponse.redirect",
+          "getToken",
+          "loginUrl.searchParams.set",
+          "headers.set",
+          "NextResponse.next"
+        ],
+        "referencedVariables": [
+          "middleware",
+          "request",
+          "NextRequest",
+          "pathname",
+          "nextUrl",
+          "tenant",
+          "split",
+          "session",
+          "cookies",
+          "get",
+          "console",
+          "log",
+          "NextResponse",
+          "redirect",
+          "URL",
+          "url",
+          "secret",
+          "process",
+          "env",
+          "NEXTAUTH_SECRET",
+          "token",
+          "getToken",
+          "req",
+          "loginUrl",
+          "searchParams",
+          "set",
+          "headers",
+          "Headers",
+          "next"
+        ],
+        "signature": "export async function middleware(request: NextRequest) {\r\n  const pathname = request.nextUrl.pathname;\r\n  const tenant = pathname.split('/')[1];\r\n  const session = request.cookies.get('next-auth.session-token');\r\n  console.log(request);\r\n\r\n  // Validate tenant\r\n  if (!session) {\r\n    return NextResponse.redirect(new URL('/api/auth/signin', request.url));\r\n  }\r\n\r\n  // Get the authentication token\r\n  const secret = process.env.NEXTAUTH_SECRET;\r\n  const token = await getToken({ \r\n    req: request,\r\n    secret,\r\n    // If you're using a different cookie name or encryption\r\n    // cookieName: 'next-auth.session-token',\r\n    // secureCookie: process.env.NODE_ENV === 'production'\r\n  });\r\n\r\n  // If no valid token, redirect to login\r\n  if (!token) {\r\n    const loginUrl = new URL('/login', request.url);\r\n    loginUrl.searchParams.set('callbackUrl', request.url);\r\n    return NextResponse.redirect(loginUrl);\r\n  }\r\n\r\n  // Add tenant context to headers\r\n  const headers = new Headers(request.headers);\r\n  headers.set('x-tenant-id', tenant);\r\n\r\n  return NextResponse.next({\r\n    request: {\r\n      headers\r\n    }\r\n  });\r\n}",
+        "snippet": "export async function middleware(request: NextRequest) {\r\n  const pathname = request.nextUrl.pathname;\r\n  const tenant = pathname.split('/')[1];\r\n  const session = request.cookies.get('next-auth.session-token');\r\n  console.log(request);\r\n\r\n  // Validate tenant\r\n  if (!session) {\r\n    return NextResponse.redirect(new URL('/api/auth/signin', request.url));\r\n  }\r\n\r\n  // Get the authentication token\r\n  const secret = process.env.NEXTAUTH_SECRET;\r\n  const token = await getToken({ \r\n    req: request,\r\n    secret,\r\n    // If you're using a different cookie name or encryption\r\n    // cookieName: 'next-auth.session-token',\r\n    // secureCookie: process.env.NODE_ENV === 'production'\r\n  });\r\n\r\n  // If no valid token, redirect to login\r\n  if (!token) {\r\n    const loginUrl = new URL('/login', request.url);\r\n    loginUrl.searchParams.set('callbackUrl', request.url);\r\n    return NextResponse.redirect(loginUrl);\r\n  }\r\n\r\n  // Add tenant context to headers\r\n  const headers = new Headers(request.headers)"
+      }
+    ]
+  },
+  {
+    "filePath": "E:/Dev/websites/repairradar-v0.1/src/lib/prisma-extended.ts",
+    "exports": [
+      {
+        "name": "default",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.$extends",
+          "generateSecureToken",
+          "expires.setDate",
+          "expires.getDate",
+          "prisma.session.create",
+          "cookies",
+          "cookieStore.set",
+          "console.error",
+          "(await cookies()).get",
+          "prisma.session.findUnique",
+          "prisma.session.delete",
+          "(await cookies()).delete",
+          "cookieStore.get",
+          "prisma.session.update",
+          "prisma.session.deleteMany"
+        ],
+        "referencedVariables": [
+          "sessionExtension",
+          "prisma",
+          "PrismaClient",
+          "$extends",
+          "model",
+          "session",
+          "create",
+          "data",
+          "userId",
+          "expires",
+          "Date",
+          "Promise",
+          "SessionWithUser",
+          "sessionToken",
+          "generateSecureToken",
+          "SESSION_TOKEN_BYTES",
+          "setDate",
+          "getDate",
+          "SESSION_DURATION_DAYS",
+          "include",
+          "user",
+          "tenant",
+          "cookieStore",
+          "cookies",
+          "set",
+          "name",
+          "SESSION_COOKIE_NAME",
+          "value",
+          "httpOnly",
+          "secure",
+          "process",
+          "env",
+          "NODE_ENV",
+          "sameSite",
+          "path",
+          "error",
+          "console",
+          "Error",
+          "findSessionByToken",
+          "token",
+          "get",
+          "findUnique",
+          "where",
+          "deleteSession",
+          "delete",
+          "rotateSession",
+          "oldToken",
+          "newToken",
+          "update",
+          "updatedAt",
+          "cleanExpiredSessions",
+          "count",
+          "deleteMany",
+          "lt",
+          "validateSession",
+          "isValid",
+          "updateSessionData",
+          "Partial",
+          "Pick",
+          "Session"
+        ],
+        "signature": "export default function sessionExtension(prisma: PrismaClient) {\r\n  return prisma.$extends({\r\n    model: {\r\n      session: {\r\n        async create(data: {\r\n          userId: string\r\n          expires?: Date\r\n        }): Promise<SessionWithUser> {\r\n          try {\r\n            const sessionToken = generateSecureToken(SESSION_TOKEN_BYTES)\r\n            const expires = data.expires || new Date()\r\n            expires.setDate(expires.getDate() + SESSION_DURATION_DAYS)\r\n\r\n            const session = await prisma.session.create({\r\n              data: {\r\n                sessionToken,\r\n                userId: data.userId,\r\n                expires,\r\n              },\r\n              include: {\r\n                user: {\r\n                  include: {\r\n                    tenant: true\r\n                  }\r\n                }\r\n              }\r\n            })\r\n            \r\n            const cookieStore = (await cookies());\r\n            // Set HTTP-only cookie\r\n            cookieStore.set({\r\n              name: SESSION_COOKIE_NAME,\r\n              value: sessionToken,\r\n              expires,\r\n              httpOnly: true,\r\n              secure: process.env.NODE_ENV === 'production',\r\n              sameSite: 'lax',\r\n              path: '/',\r\n            })\r\n\r\n            return session\r\n          } catch (error) {\r\n            console.error('Failed to create session:', error)\r\n            throw new Error('SESSION_CREATION_FAILED')\r\n          }\r\n        },\r\n\r\n        async findSessionByToken(sessionToken?: string): Promise<SessionWithUser | null> {\r\n          try {\r\n            const token = sessionToken || (await cookies()).get(SESSION_COOKIE_NAME)?.value\r\n            if (!token) return null\r\n\r\n            return await prisma.session.findUnique({\r\n              where: { sessionToken: token },\r\n              include: {\r\n                user: {\r\n                  include: {\r\n                    tenant: true\r\n                  }\r\n                }\r\n              }\r\n            })\r\n          } catch (error) {\r\n            console.error('Failed to find session:', error)\r\n            return null\r\n          }\r\n        },\r\n\r\n        async deleteSession(sessionToken?: string): Promise<void> {\r\n          try {\r\n            const token = sessionToken || (await cookies()).get(SESSION_COOKIE_NAME)?.value\r\n            if (!token) return\r\n\r\n            await prisma.session.delete({\r\n              where: { sessionToken: token }\r\n            });\r\n\r\n            // Clear cookie\r\n            (await cookies()).delete(SESSION_COOKIE_NAME);\r\n          } catch (error) {\r\n            console.error('Failed to delete session:', error)\r\n            throw new Error('SESSION_DELETION_FAILED')\r\n          }\r\n        },\r\n\r\n        async rotateSession(): Promise<SessionWithUser> {\r\n          try {\r\n            const cookieStore = await cookies()\r\n            const oldToken = cookieStore.get(SESSION_COOKIE_NAME)?.value\r\n            if (!oldToken) throw new Error('NO_SESSION_TOKEN')\r\n\r\n            const newToken = generateSecureToken(SESSION_TOKEN_BYTES)\r\n            const expires = new Date()\r\n            expires.setDate(expires.getDate() + SESSION_DURATION_DAYS)\r\n\r\n            const session = await prisma.session.update({\r\n              where: { sessionToken: oldToken },\r\n              data: {\r\n                sessionToken: newToken,\r\n                expires,\r\n                updatedAt: new Date()\r\n              },\r\n              include: {\r\n                user: {\r\n                  include: {\r\n                    tenant: true\r\n                  }\r\n                }\r\n              }\r\n            })\r\n\r\n            // Update cookie with new token\r\n            cookieStore.set({\r\n              name: SESSION_COOKIE_NAME,\r\n              value: newToken,\r\n              expires,\r\n              httpOnly: true,\r\n              secure: process.env.NODE_ENV === 'production',\r\n              sameSite: 'lax',\r\n              path: '/',\r\n            })\r\n\r\n            return session\r\n          } catch (error) {\r\n            console.error('Failed to rotate session:', error)\r\n            throw new Error('SESSION_ROTATION_FAILED')\r\n          }\r\n        },\r\n\r\n        async cleanExpiredSessions(): Promise<{ count: number }> {\r\n          try {\r\n            return await prisma.session.deleteMany({\r\n              where: {\r\n                expires: {\r\n                  lt: new Date()\r\n                }\r\n              }\r\n            })\r\n          } catch (error) {\r\n            console.error('Failed to clean expired sessions:', error)\r\n            return { count: 0 }\r\n          }\r\n        },\r\n\r\n        async validateSession(\r\n          sessionToken?: string\r\n        ): Promise<{ isValid: boolean; session?: SessionWithUser }> {\r\n          try {\r\n            const token = sessionToken || (await cookies()).get(SESSION_COOKIE_NAME)?.value\r\n            if (!token) return { isValid: false }\r\n\r\n            const session = await prisma.session.findUnique({\r\n              where: { sessionToken: token },\r\n              include: {\r\n                user: {\r\n                  include: {\r\n                    tenant: true\r\n                  }\r\n                }\r\n              }\r\n            })\r\n\r\n            if (!session) return { isValid: false }\r\n            if (session.expires < new Date()) {\r\n              await prisma.session.delete({ where: { sessionToken: token } });\r\n              (await cookies()).delete(SESSION_COOKIE_NAME);\r\n              return { isValid: false }\r\n            }\r\n\r\n            return { isValid: true, session }\r\n          } catch (error) {\r\n            console.error('Session validation failed:', error)\r\n            return { isValid: false }\r\n          }\r\n        },\r\n\r\n        async updateSessionData(\r\n          data: Partial<Pick<Session, 'expires'>>,\r\n          sessionToken?: string\r\n        ): Promise<SessionWithUser | null> {\r\n          try {\r\n            const token = sessionToken || (await cookies()).get(SESSION_COOKIE_NAME)?.value;\r\n            if (!token) return null\r\n\r\n            return await prisma.session.update({\r\n              where: { sessionToken: token },\r\n              data: {\r\n                ...data,\r\n                updatedAt: new Date()\r\n              },\r\n              include: {\r\n                user: {\r\n                  include: {\r\n                    tenant: true\r\n                  }\r\n                }\r\n              }\r\n            })\r\n          } catch (error) {\r\n            console.error('Failed to update session data:', error)\r\n            return null\r\n          }\r\n        }\r\n      }\r\n    }\r\n  })\r\n}",
+        "snippet": "export default function sessionExtension(prisma: PrismaClient) {\r\n  return prisma.$extends({\r\n    model: {\r\n      session: {\r\n        async create(data: {\r\n          userId: string\r\n          expires?: Date\r\n        }): Promise<SessionWithUser> {\r\n          try {\r\n            const sessionToken = generateSecureToken(SESSION_TOKEN_BYTES)\r\n            const expires = data.expires || new Date()\r\n            expires.setDate(expires.getDate() + SESSION_DURATION_DAYS)\r\n\r\n            const session = await prisma.session.create({\r\n              data: {\r\n                sessionToken,\r\n                userId: data.userId,\r\n                expires,\r\n              },\r\n              include: {\r\n                user: {\r\n                  include: {\r\n                    tenant: true\r\n                  }\r\n                }\r\n              }\r\n            })\r\n            \r\n            const cookieStore = (await cookies());\r\n            // Set HTTP-only cookie\r\n            cookieStore.set({\r\n             "
+      },
+      {
+        "name": "SessionWithUser",
+        "kind": "InterfaceDeclaration",
+        "documentation": [],
+        "calledFunctions": [],
+        "referencedVariables": [
+          "SessionWithUser",
+          "Session",
+          "id",
+          "sessionToken",
+          "userId",
+          "expires",
+          "Date",
+          "createdAt",
+          "updatedAt",
+          "user",
+          "User",
+          "tenant",
+          "Tenant"
+        ],
+        "signature": null,
+        "snippet": "export interface SessionWithUser extends Session {\r\n  id: string;\r\n  sessionToken: string;\r\n  userId: string;\r\n  expires: Date;\r\n  createdAt: Date;\r\n  updatedAt: Date;\r\n  user: User & {\r\n    tenant: Tenant | null\r\n  }\r\n}"
+      }
+    ]
+  },
+  {
+    "filePath": "E:/Dev/websites/repairradar-v0.1/src/lib/prisma.ts",
+    "exports": [
+      {
+        "name": "prisma",
+        "kind": "VariableDeclaration",
+        "documentation": [],
+        "calledFunctions": [],
+        "referencedVariables": [
+          "prisma",
+          "globalForPrisma",
+          "PrismaClient",
+          "errorFormat",
+          "log",
+          "level",
+          "emit"
+        ],
+        "signature": null,
+        "snippet": "prisma =\r\n  globalForPrisma.prisma ||\r\n  new PrismaClient({\r\n    errorFormat: 'pretty',\r\n    log: [{level:\"query\", emit: \"event\"}, {level: \"error\", emit:\"stdout\"}],\r\n  })"
+      }
+    ]
+  },
+  {
+    "filePath": "E:/Dev/websites/repairradar-v0.1/src/lib/tenant-cache.ts",
+    "exports": [
+      {
+        "name": "getTenantData",
+        "kind": "VariableDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "cache",
+          "prisma.tenant.findUnique"
+        ],
+        "referencedVariables": [
+          "getTenantData",
+          "cache",
+          "subdomain",
+          "Promise",
+          "TenantWithRelations",
+          "prisma",
+          "tenant",
+          "findUnique",
+          "where",
+          "include",
+          "settings",
+          "users",
+          "assets"
+        ],
+        "signature": null,
+        "snippet": "getTenantData = cache(async (subdomain: string): Promise<TenantWithRelations> => {\r\n  return await prisma.tenant.findUnique({\r\n    where: { subdomain },\r\n    include: {\r\n      settings: true,\r\n      users: true,\r\n      assets: true,\r\n\r\n      // Other frequently accessed relations\r\n    }\r\n  }) as TenantWithRelations\r\n})"
+      }
+    ]
+  },
+  {
+    "filePath": "E:/Dev/websites/repairradar-v0.1/src/lib/utils.ts",
+    "exports": [
+      {
+        "name": "cn",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "twMerge",
+          "clsx"
+        ],
+        "referencedVariables": [
+          "cn",
+          "inputs",
+          "ClassValue",
+          "twMerge",
+          "clsx"
+        ],
+        "signature": "export function cn(...inputs: ClassValue[]) {\r\n  return twMerge(clsx(inputs))\r\n}",
+        "snippet": "export function cn(...inputs: ClassValue[]) {\r\n  return twMerge(clsx(inputs))\r\n}"
+      },
+      {
+        "name": "transformData",
+        "kind": "VariableDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "Object.fromEntries",
+          "Object.entries(data).map",
+          "Object.entries",
+          "key.replace",
+          "letter.toUpperCase",
+          "/\\d{4}-\\d{2}-\\d{2}T/.test",
+          "transformData"
+        ],
+        "referencedVariables": [
+          "transformData",
+          "T",
+          "data",
+          "TransformedData",
+          "Object",
+          "fromEntries",
+          "entries",
+          "map",
+          "key",
+          "value",
+          "replace",
+          "_",
+          "letter",
+          "toUpperCase",
+          "test",
+          "Date"
+        ],
+        "signature": null,
+        "snippet": "transformData = <T>(data: T): TransformedData<T> =>\r\n  !data || typeof data !== \"object\"\r\n    ? (data as TransformedData<T>) // Cast primitive types to the return type\r\n    : Object.fromEntries(\r\n        Object.entries(data).map(([key, value]) => [\r\n          key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase()),\r\n          typeof value === \"string\" && /\\d{4}-\\d{2}-\\d{2}T/.test(value)\r\n            ? new Date(value)\r\n            : transformData(value),\r\n        ])\r\n      ) as TransformedData<T>"
+      }
+    ]
+  },
+  {
+    "filePath": "E:/Dev/websites/repairradar-v0.1/src/types/dashboard.ts",
+    "exports": [
+      {
+        "name": "DashboardData",
+        "kind": "InterfaceDeclaration",
+        "documentation": [],
+        "calledFunctions": [],
+        "referencedVariables": [
+          "DashboardData",
+          "assets",
+          "Asset",
+          "incidents",
+          "Incident",
+          "workOrders",
+          "WorkOrder",
+          "parts",
+          "Part",
+          "timestamp",
+          "vendors",
+          "Vendor",
+          "maintenanceSchedules",
+          "assetCategories",
+          "assetTypes",
+          "metrics",
+          "activeCalls",
+          "criticalCalls",
+          "openWorkOrders",
+          "inProgressWorkOrders",
+          "overdueMaintenance",
+          "lowStockParts"
+        ],
+        "signature": null,
+        "snippet": "export interface DashboardData {\r\n    assets: Asset[];\r\n    incidents: Incident[];\r\n    workOrders: WorkOrder[];\r\n    parts: Part[];\r\n    timestamp?: string;\r\n    // Add other fields as needed from server actions response\r\n    vendors?: Vendor[];\r\n    maintenanceSchedules?: any[];\r\n    assetCategories?: any[];\r\n    assetTypes?: any[];\r\n    metrics?: {\r\n      activeCalls: number;\r\n      criticalCalls: number;\r\n      openWorkOrders: number;\r\n      inProgressWorkOrders: number;\r\n      overdueMaintenance: number;\r\n      lowStockParts: number;\r\n    };\r\n  }"
+      }
+    ]
+  },
+  {
+    "filePath": "E:/Dev/websites/repairradar-v0.1/src/types/tenant.ts",
+    "exports": [
+      {
+        "name": "TenantWithRelations",
+        "kind": "TypeAliasDeclaration",
+        "documentation": [],
+        "calledFunctions": [],
+        "referencedVariables": [
+          "TenantWithRelations",
+          "Prisma",
+          "TenantGetPayload",
+          "include",
+          "parent",
+          "settings",
+          "users",
+          "categories",
+          "assetTypes",
+          "assets",
+          "meters",
+          "maintenance",
+          "workOrders",
+          "parts",
+          "vendors",
+          "incidents",
+          "children"
+        ],
+        "signature": null,
+        "snippet": "export type TenantWithRelations = Prisma.TenantGetPayload<{\r\n    include: {\r\n      parent: true;           // Include parent tenant (if exists)\r\n      settings: true;         // Include tenant settings (if exists)\r\n      users: true;            // Include related users\r\n      categories: true;       // Include asset categories\r\n      assetTypes: true;       // Include asset types\r\n      assets: true;           // Include assets\r\n      meters: true;           // Include meters\r\n      maintenance: true;      // Include maintenance schedules\r\n      workOrders: true;       // Include work orders\r\n      parts: true;            // Include parts\r\n      vendors: true;          // Include vendors\r\n      incidents: true;        // Include incidents\r\n      children: true;         // Include child tenants (if exists)\r\n    };\r\n}>;"
+      }
+    ]
+  },
+  {
+    "filePath": "E:/Dev/websites/repairradar-v0.1/src/actions/admin/users.ts",
+    "exports": [
+      {
+        "name": "createUser",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "requireAuth",
+          "prisma.user.create"
+        ],
+        "referencedVariables": [
+          "createUser",
+          "name",
+          "email",
+          "employeeId",
+          "role",
+          "tenantId",
+          "firstName",
+          "lastName",
+          "password",
+          "UserRole",
+          "user",
+          "requireAuth",
+          "ADMIN",
+          "Error",
+          "newUser",
+          "prisma",
+          "create",
+          "data",
+          "error"
+        ],
+        "signature": "export async function createUser({\r\n  name,\r\n  email,\r\n  employeeId,\r\n  role,\r\n  tenantId,\r\n  firstName,\r\n  lastName,\r\n  password,\r\n}: {\r\n  name: string;\r\n  email: string;\r\n  employeeId: string;\r\n  role: UserRole;\r\n  tenantId: string;\r\n  firstName?: string;\r\n  lastName?: string;\r\n  password?: string;\r\n}) {\r\n  try {\r\n    const { user } = await requireAuth();\r\n    if (!user || user.role !== UserRole.ADMIN) {\r\n      throw new Error('Unauthorized');\r\n    }\r\n\r\n    const newUser = await prisma.user.create({\r\n      data: {\r\n        name,\r\n        email,\r\n        employeeId,\r\n        role,\r\n        tenantId,\r\n        firstName,\r\n        lastName,\r\n        password,\r\n      },\r\n    });\r\n\r\n    return { error: null, user: newUser };\r\n  } catch (error) {\r\n    return { error: 'Failed to create user' };\r\n  }\r\n}",
+        "snippet": "export async function createUser({\r\n  name,\r\n  email,\r\n  employeeId,\r\n  role,\r\n  tenantId,\r\n  firstName,\r\n  lastName,\r\n  password,\r\n}: {\r\n  name: string;\r\n  email: string;\r\n  employeeId: string;\r\n  role: UserRole;\r\n  tenantId: string;\r\n  firstName?: string;\r\n  lastName?: string;\r\n  password?: string;\r\n}) {\r\n  try {\r\n    const { user } = await requireAuth();\r\n    if (!user || user.role !== UserRole.ADMIN) {\r\n      throw new Error('Unauthorized');\r\n    }\r\n\r\n    const newUser = await prisma.user.create({\r\n      data: {\r\n        name,\r\n        email,\r\n        employeeId,\r\n        role,\r\n        tenantId,\r\n        firstName,\r\n        lastName,\r\n        password,\r\n      },\r\n    });\r\n\r\n    return { error: null, user: newUser };\r\n  } catch (error) {\r\n    return { error: 'Failed to create user' };\r\n  }\r\n}"
+      },
+      {
+        "name": "updateUser",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "requireAuth",
+          "prisma.user.update"
+        ],
+        "referencedVariables": [
+          "updateUser",
+          "userId",
+          "data",
+          "Partial",
+          "name",
+          "email",
+          "role",
+          "UserRole",
+          "firstName",
+          "lastName",
+          "password",
+          "user",
+          "requireAuth",
+          "ADMIN",
+          "Error",
+          "updatedUser",
+          "prisma",
+          "update",
+          "where",
+          "id",
+          "error"
+        ],
+        "signature": "export async function updateUser(\r\n  userId: string,\r\n  data: Partial<{\r\n    name: string;\r\n    email: string;\r\n    role: UserRole;\r\n    firstName: string;\r\n    lastName: string;\r\n    password: string;\r\n  }>\r\n) {\r\n  try {\r\n    const { user } = await requireAuth();\r\n    if (!user || user.role !== UserRole.ADMIN) {\r\n      throw new Error('Unauthorized');\r\n    }\r\n\r\n    const updatedUser = await prisma.user.update({\r\n      where: { id: userId },\r\n      data,\r\n    });\r\n\r\n    return { error: null, user: updatedUser };\r\n  } catch (error) {\r\n    return { error: 'Failed to update user' };\r\n  }\r\n}",
+        "snippet": "export async function updateUser(\r\n  userId: string,\r\n  data: Partial<{\r\n    name: string;\r\n    email: string;\r\n    role: UserRole;\r\n    firstName: string;\r\n    lastName: string;\r\n    password: string;\r\n  }>\r\n) {\r\n  try {\r\n    const { user } = await requireAuth();\r\n    if (!user || user.role !== UserRole.ADMIN) {\r\n      throw new Error('Unauthorized');\r\n    }\r\n\r\n    const updatedUser = await prisma.user.update({\r\n      where: { id: userId },\r\n      data,\r\n    });\r\n\r\n    return { error: null, user: updatedUser };\r\n  } catch (error) {\r\n    return { error: 'Failed to update user' };\r\n  }\r\n}"
+      },
+      {
+        "name": "deleteUser",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "requireAuth",
+          "prisma.user.update"
+        ],
+        "referencedVariables": [
+          "deleteUser",
+          "userId",
+          "user",
+          "requireAuth",
+          "role",
+          "UserRole",
+          "ADMIN",
+          "Error",
+          "deletedUser",
+          "prisma",
+          "update",
+          "where",
+          "id",
+          "data",
+          "deletedAt",
+          "Date",
+          "error"
+        ],
+        "signature": "export async function deleteUser(userId: string) {\r\n  try {\r\n    const { user } = await requireAuth();\r\n    if (!user || user.role !== UserRole.ADMIN) {\r\n      throw new Error('Unauthorized');\r\n    }\r\n\r\n    const deletedUser = await prisma.user.update({\r\n      where: { id: userId },\r\n      data: { deletedAt: new Date() },\r\n    });\r\n\r\n    return { error: null, user: deletedUser };\r\n  } catch (error) {\r\n    return { error: 'Failed to delete user' };\r\n  }\r\n}",
+        "snippet": "export async function deleteUser(userId: string) {\r\n  try {\r\n    const { user } = await requireAuth();\r\n    if (!user || user.role !== UserRole.ADMIN) {\r\n      throw new Error('Unauthorized');\r\n    }\r\n\r\n    const deletedUser = await prisma.user.update({\r\n      where: { id: userId },\r\n      data: { deletedAt: new Date() },\r\n    });\r\n\r\n    return { error: null, user: deletedUser };\r\n  } catch (error) {\r\n    return { error: 'Failed to delete user' };\r\n  }\r\n}"
+      },
+      {
+        "name": "fetchUsers",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "requireAuth",
+          "prisma.user.findMany"
+        ],
+        "referencedVariables": [
+          "fetchUsers",
+          "tenantId",
+          "user",
+          "requireAuth",
+          "Error",
+          "users",
+          "prisma",
+          "findMany",
+          "where",
+          "deletedAt",
+          "select",
+          "id",
+          "name",
+          "email",
+          "role",
+          "firstName",
+          "lastName",
+          "employeeId",
+          "createdAt",
+          "error"
+        ],
+        "signature": "export async function fetchUsers(tenantId: string) {\r\n  try {\r\n    const { user } = await requireAuth();\r\n    if (!user || user.tenantId !== tenantId) {\r\n      throw new Error('Unauthorized');\r\n    }\r\n\r\n    const users = await prisma.user.findMany({\r\n      where: {\r\n        tenantId,\r\n        deletedAt: null,\r\n      },\r\n      select: {\r\n        id: true,\r\n        name: true,\r\n        email: true,\r\n        role: true,\r\n        firstName: true,\r\n        lastName: true,\r\n        employeeId: true,\r\n        createdAt: true,\r\n      },\r\n    });\r\n\r\n    return { error: null, users };\r\n  } catch (error) {\r\n    return { error: 'Failed to fetch users' };\r\n  }\r\n}",
+        "snippet": "export async function fetchUsers(tenantId: string) {\r\n  try {\r\n    const { user } = await requireAuth();\r\n    if (!user || user.tenantId !== tenantId) {\r\n      throw new Error('Unauthorized');\r\n    }\r\n\r\n    const users = await prisma.user.findMany({\r\n      where: {\r\n        tenantId,\r\n        deletedAt: null,\r\n      },\r\n      select: {\r\n        id: true,\r\n        name: true,\r\n        email: true,\r\n        role: true,\r\n        firstName: true,\r\n        lastName: true,\r\n        employeeId: true,\r\n        createdAt: true,\r\n      },\r\n    });\r\n\r\n    return { error: null, users };\r\n  } catch (error) {\r\n    return { error: 'Failed to fetch users' };\r\n  }\r\n}"
+      },
+      {
+        "name": "fetchUser",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "requireAuth",
+          "prisma.user.findUnique"
+        ],
+        "referencedVariables": [
+          "fetchUser",
+          "userId",
+          "user",
+          "requireAuth",
+          "Error",
+          "foundUser",
+          "prisma",
+          "findUnique",
+          "where",
+          "id",
+          "select",
+          "name",
+          "email",
+          "role",
+          "firstName",
+          "lastName",
+          "employeeId",
+          "tenantId",
+          "createdAt",
+          "error"
+        ],
+        "signature": "export async function fetchUser(userId: string) {\r\n  try {\r\n    const { user } = await requireAuth();\r\n    if (!user) {\r\n      throw new Error('Unauthorized');\r\n    }\r\n\r\n    const foundUser = await prisma.user.findUnique({\r\n      where: { id: userId },\r\n      select: {\r\n        id: true,\r\n        name: true,\r\n        email: true,\r\n        role: true,\r\n        firstName: true,\r\n        lastName: true,\r\n        employeeId: true,\r\n        tenantId: true,\r\n        createdAt: true,\r\n      },\r\n    });\r\n\r\n    if (!foundUser || foundUser.tenantId !== user.tenantId) {\r\n      throw new Error('Invalid user');\r\n    }\r\n\r\n    return { error: null, user: foundUser };\r\n  } catch (error) {\r\n    return { error: 'Failed to fetch user' };\r\n  }\r\n}",
+        "snippet": "export async function fetchUser(userId: string) {\r\n  try {\r\n    const { user } = await requireAuth();\r\n    if (!user) {\r\n      throw new Error('Unauthorized');\r\n    }\r\n\r\n    const foundUser = await prisma.user.findUnique({\r\n      where: { id: userId },\r\n      select: {\r\n        id: true,\r\n        name: true,\r\n        email: true,\r\n        role: true,\r\n        firstName: true,\r\n        lastName: true,\r\n        employeeId: true,\r\n        tenantId: true,\r\n        createdAt: true,\r\n      },\r\n    });\r\n\r\n    if (!foundUser || foundUser.tenantId !== user.tenantId) {\r\n      throw new Error('Invalid user');\r\n    }\r\n\r\n    return { error: null, user: foundUser };\r\n  } catch (error) {\r\n    return { error: 'Failed to fetch user' };\r\n  }\r\n}"
+      }
+    ]
+  },
+  {
+    "filePath": "E:/Dev/websites/repairradar-v0.1/src/actions/assets/index.ts",
+    "exports": [
+      {
+        "name": "createAsset",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// Asset"
+        ],
+        "calledFunctions": [
+          "prisma.asset.create"
+        ],
+        "referencedVariables": [
+          "createAsset",
+          "data",
+          "Prisma",
+          "AssetUncheckedCreateInput",
+          "prisma",
+          "asset",
+          "create"
+        ],
+        "signature": "export async function createAsset(data: Prisma.AssetUncheckedCreateInput) {\r\n        return prisma.asset.create({ data });\r\n}",
+        "snippet": "export async function createAsset(data: Prisma.AssetUncheckedCreateInput) {\r\n        return prisma.asset.create({ data });\r\n}"
+      },
+      {
+        "name": "updateAsset",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.asset.update"
+        ],
+        "referencedVariables": [
+          "updateAsset",
+          "id",
+          "data",
+          "Prisma",
+          "AssetUncheckedUpdateInput",
+          "prisma",
+          "asset",
+          "update",
+          "where"
+        ],
+        "signature": "export async function updateAsset(id: string, data: Prisma.AssetUncheckedUpdateInput) {\r\n  return prisma.asset.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}",
+        "snippet": "export async function updateAsset(id: string, data: Prisma.AssetUncheckedUpdateInput) {\r\n  return prisma.asset.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}"
+      },
+      {
+        "name": "deleteAsset",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.asset.update"
+        ],
+        "referencedVariables": [
+          "deleteAsset",
+          "id",
+          "prisma",
+          "asset",
+          "update",
+          "where",
+          "data",
+          "deletedAt",
+          "Date"
+        ],
+        "signature": "export async function deleteAsset(id: string) {\r\n  return prisma.asset.update({\r\n    where: { id },\r\n    data: { deletedAt: new Date() },\r\n  });\r\n}",
+        "snippet": "export async function deleteAsset(id: string) {\r\n  return prisma.asset.update({\r\n    where: { id },\r\n    data: { deletedAt: new Date() },\r\n  });\r\n}"
+      },
+      {
+        "name": "getAsset",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.asset.findUnique"
+        ],
+        "referencedVariables": [
+          "getAsset",
+          "id",
+          "prisma",
+          "asset",
+          "findUnique",
+          "where",
+          "include",
+          "assetType",
+          "assetMeters",
+          "meter"
+        ],
+        "signature": "export async function getAsset(id: string) {\r\n  return prisma.asset.findUnique({\r\n    where: { id },\r\n    include: { assetType: true, assetMeters: { include: { meter: true } } },\r\n  });\r\n}",
+        "snippet": "export async function getAsset(id: string) {\r\n  return prisma.asset.findUnique({\r\n    where: { id },\r\n    include: { assetType: true, assetMeters: { include: { meter: true } } },\r\n  });\r\n}"
+      },
+      {
+        "name": "getAssets",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "Promise.all",
+          "prisma.asset.findMany",
+          "prisma.asset.count"
+        ],
+        "referencedVariables": [
+          "getAssets",
+          "tenantId",
+          "skip",
+          "take",
+          "assets",
+          "total",
+          "Promise",
+          "all",
+          "prisma",
+          "asset",
+          "findMany",
+          "where",
+          "deletedAt",
+          "include",
+          "assetType",
+          "count"
+        ],
+        "signature": "export async function getAssets({\r\n  tenantId,\r\n  skip = 0,\r\n  take = 10,\r\n}: {\r\n  tenantId: string;\r\n  skip?: number;\r\n  take?: number;\r\n}) {\r\n  const [assets, total] = await Promise.all([\r\n    prisma.asset.findMany({\r\n      where: { tenantId, deletedAt: null },\r\n      include: { assetType: true },\r\n      skip,\r\n      take,\r\n    }),\r\n    prisma.asset.count({ where: { tenantId, deletedAt: null } }),\r\n  ]);\r\n  return { assets, total };\r\n}",
+        "snippet": "export async function getAssets({\r\n  tenantId,\r\n  skip = 0,\r\n  take = 10,\r\n}: {\r\n  tenantId: string;\r\n  skip?: number;\r\n  take?: number;\r\n}) {\r\n  const [assets, total] = await Promise.all([\r\n    prisma.asset.findMany({\r\n      where: { tenantId, deletedAt: null },\r\n      include: { assetType: true },\r\n      skip,\r\n      take,\r\n    }),\r\n    prisma.asset.count({ where: { tenantId, deletedAt: null } }),\r\n  ]);\r\n  return { assets, total };\r\n}"
+      },
+      {
+        "name": "createAssetCategory",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// AssetCategory"
+        ],
+        "calledFunctions": [
+          "prisma.assetCategory.create"
+        ],
+        "referencedVariables": [
+          "createAssetCategory",
+          "data",
+          "Prisma",
+          "AssetCategoryUncheckedCreateInput",
+          "prisma",
+          "assetCategory",
+          "create"
+        ],
+        "signature": "export async function createAssetCategory(data: Prisma.AssetCategoryUncheckedCreateInput) {\r\n  return prisma.assetCategory.create({ data });\r\n}",
+        "snippet": "export async function createAssetCategory(data: Prisma.AssetCategoryUncheckedCreateInput) {\r\n  return prisma.assetCategory.create({ data });\r\n}"
+      },
+      {
+        "name": "updateAssetCategory",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.assetCategory.update"
+        ],
+        "referencedVariables": [
+          "updateAssetCategory",
+          "id",
+          "data",
+          "Prisma",
+          "AssetCategoryUpdateInput",
+          "prisma",
+          "assetCategory",
+          "update",
+          "where"
+        ],
+        "signature": "export async function updateAssetCategory(id: string, data: Prisma.AssetCategoryUpdateInput) {\r\n  return prisma.assetCategory.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}",
+        "snippet": "export async function updateAssetCategory(id: string, data: Prisma.AssetCategoryUpdateInput) {\r\n  return prisma.assetCategory.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}"
+      },
+      {
+        "name": "getAssetCategories",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.assetCategory.findMany"
+        ],
+        "referencedVariables": [
+          "getAssetCategories",
+          "tenantId",
+          "prisma",
+          "assetCategory",
+          "findMany",
+          "where"
+        ],
+        "signature": "export async function getAssetCategories(tenantId: string) {\r\n  return prisma.assetCategory.findMany({\r\n    where: { tenantId },\r\n  });\r\n}",
+        "snippet": "export async function getAssetCategories(tenantId: string) {\r\n  return prisma.assetCategory.findMany({\r\n    where: { tenantId },\r\n  });\r\n}"
+      },
+      {
+        "name": "createAssetType",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// AssetType"
+        ],
+        "calledFunctions": [
+          "prisma.assetType.create"
+        ],
+        "referencedVariables": [
+          "createAssetType",
+          "data",
+          "Prisma",
+          "AssetTypeUncheckedCreateInput",
+          "prisma",
+          "assetType",
+          "create"
+        ],
+        "signature": "export async function createAssetType(data: Prisma.AssetTypeUncheckedCreateInput) {\r\n  return prisma.assetType.create({ data });\r\n}",
+        "snippet": "export async function createAssetType(data: Prisma.AssetTypeUncheckedCreateInput) {\r\n  return prisma.assetType.create({ data });\r\n}"
+      },
+      {
+        "name": "updateAssetType",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.assetType.update"
+        ],
+        "referencedVariables": [
+          "updateAssetType",
+          "id",
+          "data",
+          "Prisma",
+          "AssetTypeUpdateInput",
+          "prisma",
+          "assetType",
+          "update",
+          "where"
+        ],
+        "signature": "export async function updateAssetType(id: string, data: Prisma.AssetTypeUpdateInput) {\r\n  return prisma.assetType.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}",
+        "snippet": "export async function updateAssetType(id: string, data: Prisma.AssetTypeUpdateInput) {\r\n  return prisma.assetType.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}"
+      },
+      {
+        "name": "getAssetTypes",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.assetType.findMany"
+        ],
+        "referencedVariables": [
+          "getAssetTypes",
+          "tenantId",
+          "prisma",
+          "assetType",
+          "findMany",
+          "where",
+          "include",
+          "category"
+        ],
+        "signature": "export async function getAssetTypes(tenantId: string) {\r\n  return prisma.assetType.findMany({\r\n    where: { tenantId },\r\n    include: { category: true },\r\n  });\r\n}",
+        "snippet": "export async function getAssetTypes(tenantId: string) {\r\n  return prisma.assetType.findMany({\r\n    where: { tenantId },\r\n    include: { category: true },\r\n  });\r\n}"
+      },
+      {
+        "name": "createAssetMeter",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// AssetMeter"
+        ],
+        "calledFunctions": [
+          "prisma.assetMeter.create"
+        ],
+        "referencedVariables": [
+          "createAssetMeter",
+          "data",
+          "Prisma",
+          "AssetMeterUncheckedCreateInput",
+          "prisma",
+          "assetMeter",
+          "create"
+        ],
+        "signature": "export async function createAssetMeter(data: Prisma.AssetMeterUncheckedCreateInput) {\r\n  return prisma.assetMeter.create({ data });\r\n}",
+        "snippet": "export async function createAssetMeter(data: Prisma.AssetMeterUncheckedCreateInput) {\r\n  return prisma.assetMeter.create({ data });\r\n}"
+      },
+      {
+        "name": "updateAssetMeter",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.assetMeter.update"
+        ],
+        "referencedVariables": [
+          "updateAssetMeter",
+          "id",
+          "data",
+          "Prisma",
+          "AssetMeterUpdateInput",
+          "prisma",
+          "assetMeter",
+          "update",
+          "where"
+        ],
+        "signature": "export async function updateAssetMeter(id: string, data: Prisma.AssetMeterUpdateInput) {\r\n  return prisma.assetMeter.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}",
+        "snippet": "export async function updateAssetMeter(id: string, data: Prisma.AssetMeterUpdateInput) {\r\n  return prisma.assetMeter.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}"
+      },
+      {
+        "name": "createMeterReading",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// MeterReading"
+        ],
+        "calledFunctions": [
+          "prisma.meterReading.create"
+        ],
+        "referencedVariables": [
+          "createMeterReading",
+          "data",
+          "Prisma",
+          "MeterReadingCreateInput",
+          "prisma",
+          "meterReading",
+          "create"
+        ],
+        "signature": "export async function createMeterReading(data: Prisma.MeterReadingCreateInput) {\r\n  return prisma.meterReading.create({ data });\r\n}",
+        "snippet": "export async function createMeterReading(data: Prisma.MeterReadingCreateInput) {\r\n  return prisma.meterReading.create({ data });\r\n}"
+      },
+      {
+        "name": "getMeterReadings",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.meterReading.findMany"
+        ],
+        "referencedVariables": [
+          "getMeterReadings",
+          "assetMeterId",
+          "prisma",
+          "meterReading",
+          "findMany",
+          "where",
+          "orderBy",
+          "readingDate"
+        ],
+        "signature": "export async function getMeterReadings(assetMeterId: string) {\r\n  return prisma.meterReading.findMany({\r\n    where: { assetMeterId },\r\n    orderBy: { readingDate: \"desc\" },\r\n  });\r\n}",
+        "snippet": "export async function getMeterReadings(assetMeterId: string) {\r\n  return prisma.meterReading.findMany({\r\n    where: { assetMeterId },\r\n    orderBy: { readingDate: \"desc\" },\r\n  });\r\n}"
+      }
+    ]
+  },
+  {
+    "filePath": "E:/Dev/websites/repairradar-v0.1/src/actions/incidents/index.ts",
+    "exports": [
+      {
+        "name": "createIncident",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.incident.create"
+        ],
+        "referencedVariables": [
+          "createIncident",
+          "data",
+          "Prisma",
+          "IncidentUncheckedCreateInput",
+          "prisma",
+          "incident",
+          "create"
+        ],
+        "signature": "export async function createIncident(data: Prisma.IncidentUncheckedCreateInput) {\r\n  return prisma.incident.create({ data });\r\n}",
+        "snippet": "export async function createIncident(data: Prisma.IncidentUncheckedCreateInput) {\r\n  return prisma.incident.create({ data });\r\n}"
+      },
+      {
+        "name": "updateIncident",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.incident.update"
+        ],
+        "referencedVariables": [
+          "updateIncident",
+          "id",
+          "data",
+          "Prisma",
+          "IncidentUncheckedUpdateInput",
+          "prisma",
+          "incident",
+          "update",
+          "where"
+        ],
+        "signature": "export async function updateIncident(id: string, data: Prisma.IncidentUncheckedUpdateInput) {\r\n  return prisma.incident.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}",
+        "snippet": "export async function updateIncident(id: string, data: Prisma.IncidentUncheckedUpdateInput) {\r\n  return prisma.incident.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}"
+      },
+      {
+        "name": "deleteIncident",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.incident.update"
+        ],
+        "referencedVariables": [
+          "deleteIncident",
+          "id",
+          "prisma",
+          "incident",
+          "update",
+          "where",
+          "data",
+          "deletedAt",
+          "Date"
+        ],
+        "signature": "export async function deleteIncident(id: string) {\r\n  return prisma.incident.update({\r\n    where: { id },\r\n    data: { deletedAt: new Date() },\r\n  });\r\n}",
+        "snippet": "export async function deleteIncident(id: string) {\r\n  return prisma.incident.update({\r\n    where: { id },\r\n    data: { deletedAt: new Date() },\r\n  });\r\n}"
+      },
+      {
+        "name": "getIncident",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.incident.findUnique"
+        ],
+        "referencedVariables": [
+          "getIncident",
+          "id",
+          "prisma",
+          "incident",
+          "findUnique",
+          "where",
+          "include",
+          "asset",
+          "reportedBy"
+        ],
+        "signature": "export async function getIncident(id: string) {\r\n  return prisma.incident.findUnique({\r\n    where: { id },\r\n    include: { asset: true, reportedBy: true },\r\n  });\r\n}",
+        "snippet": "export async function getIncident(id: string) {\r\n  return prisma.incident.findUnique({\r\n    where: { id },\r\n    include: { asset: true, reportedBy: true },\r\n  });\r\n}"
+      },
+      {
+        "name": "getIncidents",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "Promise.all",
+          "prisma.incident.findMany",
+          "prisma.incident.count"
+        ],
+        "referencedVariables": [
+          "getIncidents",
+          "tenantId",
+          "skip",
+          "take",
+          "incidents",
+          "total",
+          "Promise",
+          "all",
+          "prisma",
+          "incident",
+          "findMany",
+          "where",
+          "deletedAt",
+          "include",
+          "asset",
+          "reportedBy",
+          "count"
+        ],
+        "signature": "export async function getIncidents({\r\n  tenantId,\r\n  skip = 0,\r\n  take = 10,\r\n}: {\r\n  tenantId: string;\r\n  skip?: number;\r\n  take?: number;\r\n}) {\r\n  const [incidents, total] = await Promise.all([\r\n    prisma.incident.findMany({\r\n      where: { tenantId, deletedAt: null },\r\n      include: { asset: true, reportedBy: true },\r\n      skip,\r\n      take,\r\n    }),\r\n    prisma.incident.count({ where: { tenantId, deletedAt: null } }),\r\n  ]);\r\n  return { incidents, total };\r\n}",
+        "snippet": "export async function getIncidents({\r\n  tenantId,\r\n  skip = 0,\r\n  take = 10,\r\n}: {\r\n  tenantId: string;\r\n  skip?: number;\r\n  take?: number;\r\n}) {\r\n  const [incidents, total] = await Promise.all([\r\n    prisma.incident.findMany({\r\n      where: { tenantId, deletedAt: null },\r\n      include: { asset: true, reportedBy: true },\r\n      skip,\r\n      take,\r\n    }),\r\n    prisma.incident.count({ where: { tenantId, deletedAt: null } }),\r\n  ]);\r\n  return { incidents, total };\r\n}"
+      }
+    ]
+  },
+  {
+    "filePath": "E:/Dev/websites/repairradar-v0.1/src/actions/maintenance/index.ts",
+    "exports": [
+      {
+        "name": "createMaintenanceSchedule",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// MaintenanceSchedule"
+        ],
+        "calledFunctions": [
+          "prisma.maintenanceSchedule.create"
+        ],
+        "referencedVariables": [
+          "createMaintenanceSchedule",
+          "data",
+          "Prisma",
+          "MaintenanceScheduleUncheckedCreateInput",
+          "prisma",
+          "maintenanceSchedule",
+          "create"
+        ],
+        "signature": "export async function createMaintenanceSchedule(data: Prisma.MaintenanceScheduleUncheckedCreateInput) {\r\n  return prisma.maintenanceSchedule.create({ data });\r\n}",
+        "snippet": "export async function createMaintenanceSchedule(data: Prisma.MaintenanceScheduleUncheckedCreateInput) {\r\n  return prisma.maintenanceSchedule.create({ data });\r\n}"
+      },
+      {
+        "name": "updateMaintenanceSchedule",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.maintenanceSchedule.update"
+        ],
+        "referencedVariables": [
+          "updateMaintenanceSchedule",
+          "id",
+          "data",
+          "Prisma",
+          "MaintenanceScheduleUncheckedUpdateInput",
+          "prisma",
+          "maintenanceSchedule",
+          "update",
+          "where"
+        ],
+        "signature": "export async function updateMaintenanceSchedule(id: string, data: Prisma.MaintenanceScheduleUncheckedUpdateInput) {\r\n  return prisma.maintenanceSchedule.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}",
+        "snippet": "export async function updateMaintenanceSchedule(id: string, data: Prisma.MaintenanceScheduleUncheckedUpdateInput) {\r\n  return prisma.maintenanceSchedule.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}"
+      },
+      {
+        "name": "deleteMaintenanceSchedule",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.maintenanceSchedule.update"
+        ],
+        "referencedVariables": [
+          "deleteMaintenanceSchedule",
+          "id",
+          "prisma",
+          "maintenanceSchedule",
+          "update",
+          "where",
+          "data",
+          "deletedAt",
+          "Date"
+        ],
+        "signature": "export async function deleteMaintenanceSchedule(id: string) {\r\n  return prisma.maintenanceSchedule.update({\r\n    where: { id },\r\n    data: { deletedAt: new Date() },\r\n  });\r\n}",
+        "snippet": "export async function deleteMaintenanceSchedule(id: string) {\r\n  return prisma.maintenanceSchedule.update({\r\n    where: { id },\r\n    data: { deletedAt: new Date() },\r\n  });\r\n}"
+      },
+      {
+        "name": "getMaintenanceSchedule",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.maintenanceSchedule.findUnique"
+        ],
+        "referencedVariables": [
+          "getMaintenanceSchedule",
+          "id",
+          "prisma",
+          "maintenanceSchedule",
+          "findUnique",
+          "where",
+          "include",
+          "meter",
+          "assignments",
+          "assets"
+        ],
+        "signature": "export async function getMaintenanceSchedule(id: string) {\r\n  return prisma.maintenanceSchedule.findUnique({\r\n    where: { id },\r\n    include: { meter: true, assignments: true, assets: true },\r\n  });\r\n}",
+        "snippet": "export async function getMaintenanceSchedule(id: string) {\r\n  return prisma.maintenanceSchedule.findUnique({\r\n    where: { id },\r\n    include: { meter: true, assignments: true, assets: true },\r\n  });\r\n}"
+      },
+      {
+        "name": "getMaintenanceSchedules",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "Promise.all",
+          "prisma.maintenanceSchedule.findMany",
+          "prisma.maintenanceSchedule.count"
+        ],
+        "referencedVariables": [
+          "getMaintenanceSchedules",
+          "tenantId",
+          "skip",
+          "take",
+          "schedules",
+          "total",
+          "Promise",
+          "all",
+          "prisma",
+          "maintenanceSchedule",
+          "findMany",
+          "where",
+          "deletedAt",
+          "include",
+          "meter",
+          "count"
+        ],
+        "signature": "export async function getMaintenanceSchedules({\r\n  tenantId,\r\n  skip = 0,\r\n  take = 10,\r\n}: {\r\n  tenantId: string;\r\n  skip?: number;\r\n  take?: number;\r\n}) {\r\n  const [schedules, total] = await Promise.all([\r\n    prisma.maintenanceSchedule.findMany({\r\n      where: { tenantId, deletedAt: null },\r\n      include: { meter: true },\r\n      skip,\r\n      take,\r\n    }),\r\n    prisma.maintenanceSchedule.count({ where: { tenantId, deletedAt: null } }),\r\n  ]);\r\n  return { schedules, total };\r\n}",
+        "snippet": "export async function getMaintenanceSchedules({\r\n  tenantId,\r\n  skip = 0,\r\n  take = 10,\r\n}: {\r\n  tenantId: string;\r\n  skip?: number;\r\n  take?: number;\r\n}) {\r\n  const [schedules, total] = await Promise.all([\r\n    prisma.maintenanceSchedule.findMany({\r\n      where: { tenantId, deletedAt: null },\r\n      include: { meter: true },\r\n      skip,\r\n      take,\r\n    }),\r\n    prisma.maintenanceSchedule.count({ where: { tenantId, deletedAt: null } }),\r\n  ]);\r\n  return { schedules, total };\r\n}"
+      },
+      {
+        "name": "createMaintenanceAssignment",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// MaintenanceAssignment"
+        ],
+        "calledFunctions": [
+          "prisma.maintenanceAssignment.create"
+        ],
+        "referencedVariables": [
+          "createMaintenanceAssignment",
+          "data",
+          "Prisma",
+          "MaintenanceAssignmentCreateInput",
+          "prisma",
+          "maintenanceAssignment",
+          "create"
+        ],
+        "signature": "export async function createMaintenanceAssignment(data: Prisma.MaintenanceAssignmentCreateInput) {\r\n  return prisma.maintenanceAssignment.create({ data });\r\n}",
+        "snippet": "export async function createMaintenanceAssignment(data: Prisma.MaintenanceAssignmentCreateInput) {\r\n  return prisma.maintenanceAssignment.create({ data });\r\n}"
+      },
+      {
+        "name": "deleteMaintenanceAssignment",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.maintenanceAssignment.delete"
+        ],
+        "referencedVariables": [
+          "deleteMaintenanceAssignment",
+          "maintenanceId",
+          "userId",
+          "prisma",
+          "maintenanceAssignment",
+          "delete",
+          "where",
+          "maintenanceId_userId"
+        ],
+        "signature": "export async function deleteMaintenanceAssignment(maintenanceId: string, userId: string) {\r\n  return prisma.maintenanceAssignment.delete({\r\n    where: { maintenanceId_userId: { maintenanceId, userId } },\r\n  });\r\n}",
+        "snippet": "export async function deleteMaintenanceAssignment(maintenanceId: string, userId: string) {\r\n  return prisma.maintenanceAssignment.delete({\r\n    where: { maintenanceId_userId: { maintenanceId, userId } },\r\n  });\r\n}"
+      },
+      {
+        "name": "createMaintenanceAsset",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// MaintenanceAssets"
+        ],
+        "calledFunctions": [
+          "prisma.maintenanceAssets.create"
+        ],
+        "referencedVariables": [
+          "createMaintenanceAsset",
+          "data",
+          "Prisma",
+          "MaintenanceAssetsCreateInput",
+          "prisma",
+          "maintenanceAssets",
+          "create"
+        ],
+        "signature": "export async function createMaintenanceAsset(data: Prisma.MaintenanceAssetsCreateInput) {\r\n  return prisma.maintenanceAssets.create({ data });\r\n}",
+        "snippet": "export async function createMaintenanceAsset(data: Prisma.MaintenanceAssetsCreateInput) {\r\n  return prisma.maintenanceAssets.create({ data });\r\n}"
+      },
+      {
+        "name": "deleteMaintenanceAsset",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.maintenanceAssets.delete"
+        ],
+        "referencedVariables": [
+          "deleteMaintenanceAsset",
+          "maintenanceId",
+          "assetId",
+          "prisma",
+          "maintenanceAssets",
+          "delete",
+          "where",
+          "maintenanceId_assetId"
+        ],
+        "signature": "export async function deleteMaintenanceAsset(maintenanceId: string, assetId: string) {\r\n  return prisma.maintenanceAssets.delete({\r\n    where: { maintenanceId_assetId: { maintenanceId, assetId } },\r\n  });\r\n}",
+        "snippet": "export async function deleteMaintenanceAsset(maintenanceId: string, assetId: string) {\r\n  return prisma.maintenanceAssets.delete({\r\n    where: { maintenanceId_assetId: { maintenanceId, assetId } },\r\n  });\r\n}"
+      },
+      {
+        "name": "createMeter",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// Meter"
+        ],
+        "calledFunctions": [
+          "prisma.meter.create"
+        ],
+        "referencedVariables": [
+          "createMeter",
+          "data",
+          "Prisma",
+          "MeterCreateInput",
+          "prisma",
+          "meter",
+          "create"
+        ],
+        "signature": "export async function createMeter(data: Prisma.MeterCreateInput) {\r\n  return prisma.meter.create({ data });\r\n}",
+        "snippet": "export async function createMeter(data: Prisma.MeterCreateInput) {\r\n  return prisma.meter.create({ data });\r\n}"
+      },
+      {
+        "name": "updateMeter",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.meter.update"
+        ],
+        "referencedVariables": [
+          "updateMeter",
+          "id",
+          "data",
+          "Prisma",
+          "MeterUpdateInput",
+          "prisma",
+          "meter",
+          "update",
+          "where"
+        ],
+        "signature": "export async function updateMeter(id: string, data: Prisma.MeterUpdateInput) {\r\n  return prisma.meter.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}",
+        "snippet": "export async function updateMeter(id: string, data: Prisma.MeterUpdateInput) {\r\n  return prisma.meter.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}"
+      },
+      {
+        "name": "getMeters",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.meter.findMany"
+        ],
+        "referencedVariables": [
+          "getMeters",
+          "tenantId",
+          "prisma",
+          "meter",
+          "findMany",
+          "where"
+        ],
+        "signature": "export async function getMeters(tenantId: string) {\r\n  return prisma.meter.findMany({\r\n    where: { tenantId },\r\n  });\r\n}",
+        "snippet": "export async function getMeters(tenantId: string) {\r\n  return prisma.meter.findMany({\r\n    where: { tenantId },\r\n  });\r\n}"
+      }
+    ]
+  },
+  {
+    "filePath": "E:/Dev/websites/repairradar-v0.1/src/actions/parts/index.ts",
+    "exports": [
+      {
+        "name": "createPart",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// Part"
+        ],
+        "calledFunctions": [
+          "prisma.part.create"
+        ],
+        "referencedVariables": [
+          "createPart",
+          "data",
+          "Prisma",
+          "PartUncheckedCreateInput",
+          "prisma",
+          "part",
+          "create"
+        ],
+        "signature": "export async function createPart(data: Prisma.PartUncheckedCreateInput) {\r\n  return prisma.part.create({ data });\r\n}",
+        "snippet": "export async function createPart(data: Prisma.PartUncheckedCreateInput) {\r\n  return prisma.part.create({ data });\r\n}"
+      },
+      {
+        "name": "updatePart",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.part.update"
+        ],
+        "referencedVariables": [
+          "updatePart",
+          "id",
+          "data",
+          "Prisma",
+          "PartUpdateInput",
+          "prisma",
+          "part",
+          "update",
+          "where"
+        ],
+        "signature": "export async function updatePart(id: string, data: Prisma.PartUpdateInput) {\r\n  return prisma.part.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}",
+        "snippet": "export async function updatePart(id: string, data: Prisma.PartUpdateInput) {\r\n  return prisma.part.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}"
+      },
+      {
+        "name": "deletePart",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.part.update"
+        ],
+        "referencedVariables": [
+          "deletePart",
+          "id",
+          "prisma",
+          "part",
+          "update",
+          "where",
+          "data",
+          "deletedAt",
+          "Date"
+        ],
+        "signature": "export async function deletePart(id: string) {\r\n  return prisma.part.update({\r\n    where: { id },\r\n    data: { deletedAt: new Date() },\r\n  });\r\n}",
+        "snippet": "export async function deletePart(id: string) {\r\n  return prisma.part.update({\r\n    where: { id },\r\n    data: { deletedAt: new Date() },\r\n  });\r\n}"
+      },
+      {
+        "name": "getPart",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.part.findUnique"
+        ],
+        "referencedVariables": [
+          "getPart",
+          "id",
+          "prisma",
+          "part",
+          "findUnique",
+          "where",
+          "include",
+          "vendors"
+        ],
+        "signature": "export async function getPart(id: string) {\r\n  return prisma.part.findUnique({\r\n    where: { id },\r\n    include: { vendors: true },\r\n  });\r\n}",
+        "snippet": "export async function getPart(id: string) {\r\n  return prisma.part.findUnique({\r\n    where: { id },\r\n    include: { vendors: true },\r\n  });\r\n}"
+      },
+      {
+        "name": "getParts",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "Promise.all",
+          "prisma.part.findMany",
+          "prisma.part.count"
+        ],
+        "referencedVariables": [
+          "getParts",
+          "tenantId",
+          "skip",
+          "take",
+          "parts",
+          "total",
+          "Promise",
+          "all",
+          "prisma",
+          "part",
+          "findMany",
+          "where",
+          "deletedAt",
+          "count"
+        ],
+        "signature": "export async function getParts({\r\n  tenantId,\r\n  skip = 0,\r\n  take = 10,\r\n}: {\r\n  tenantId: string;\r\n  skip?: number;\r\n  take?: number;\r\n}) {\r\n  const [parts, total] = await Promise.all([\r\n    prisma.part.findMany({\r\n      where: { tenantId, deletedAt: null },\r\n      skip,\r\n      take,\r\n    }),\r\n    prisma.part.count({ where: { tenantId, deletedAt: null } }),\r\n  ]);\r\n  return { parts, total };\r\n}",
+        "snippet": "export async function getParts({\r\n  tenantId,\r\n  skip = 0,\r\n  take = 10,\r\n}: {\r\n  tenantId: string;\r\n  skip?: number;\r\n  take?: number;\r\n}) {\r\n  const [parts, total] = await Promise.all([\r\n    prisma.part.findMany({\r\n      where: { tenantId, deletedAt: null },\r\n      skip,\r\n      take,\r\n    }),\r\n    prisma.part.count({ where: { tenantId, deletedAt: null } }),\r\n  ]);\r\n  return { parts, total };\r\n}"
+      }
+    ]
+  },
+  {
+    "filePath": "E:/Dev/websites/repairradar-v0.1/src/actions/tenants/index.ts",
+    "exports": [
+      {
+        "name": "createTenant",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// Tenant"
+        ],
+        "calledFunctions": [
+          "prisma.tenant.create"
+        ],
+        "referencedVariables": [
+          "createTenant",
+          "data",
+          "Prisma",
+          "TenantCreateInput",
+          "prisma",
+          "tenant",
+          "create"
+        ],
+        "signature": "export async function createTenant(data: Prisma.TenantCreateInput) {\r\n  return prisma.tenant.create({ data });\r\n}",
+        "snippet": "export async function createTenant(data: Prisma.TenantCreateInput) {\r\n  return prisma.tenant.create({ data });\r\n}"
+      },
+      {
+        "name": "updateTenant",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.tenant.update"
+        ],
+        "referencedVariables": [
+          "updateTenant",
+          "id",
+          "data",
+          "Prisma",
+          "TenantUncheckedUpdateInput",
+          "prisma",
+          "tenant",
+          "update",
+          "where"
+        ],
+        "signature": "export async function updateTenant(id: string, data: Prisma.TenantUncheckedUpdateInput) {\r\n  return prisma.tenant.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}",
+        "snippet": "export async function updateTenant(id: string, data: Prisma.TenantUncheckedUpdateInput) {\r\n  return prisma.tenant.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}"
+      },
+      {
+        "name": "deleteTenant",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.tenant.update"
+        ],
+        "referencedVariables": [
+          "deleteTenant",
+          "id",
+          "prisma",
+          "tenant",
+          "update",
+          "where",
+          "data",
+          "deletedAt",
+          "Date"
+        ],
+        "signature": "export async function deleteTenant(id: string) {\r\n  return prisma.tenant.update({\r\n    where: { id },\r\n    data: { deletedAt: new Date() },\r\n  });\r\n}",
+        "snippet": "export async function deleteTenant(id: string) {\r\n  return prisma.tenant.update({\r\n    where: { id },\r\n    data: { deletedAt: new Date() },\r\n  });\r\n}"
+      },
+      {
+        "name": "getTenant",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.tenant.findUnique"
+        ],
+        "referencedVariables": [
+          "getTenant",
+          "id",
+          "prisma",
+          "tenant",
+          "findUnique",
+          "where",
+          "include",
+          "settings",
+          "parent",
+          "children"
+        ],
+        "signature": "export async function getTenant(id: string) {\r\n  return prisma.tenant.findUnique({\r\n    where: { id },\r\n    include: { settings: true, parent: true, children: true },\r\n  });\r\n}",
+        "snippet": "export async function getTenant(id: string) {\r\n  return prisma.tenant.findUnique({\r\n    where: { id },\r\n    include: { settings: true, parent: true, children: true },\r\n  });\r\n}"
+      },
+      {
+        "name": "getTenantByName",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.tenant.findFirst"
+        ],
+        "referencedVariables": [
+          "getTenantByName",
+          "subdomain",
+          "prisma",
+          "tenant",
+          "findFirst",
+          "where",
+          "include",
+          "settings",
+          "parent",
+          "children"
+        ],
+        "signature": "export async function getTenantByName(subdomain: string) {\r\n    return prisma.tenant.findFirst({\r\n      where: { subdomain },\r\n      include: { settings: true, parent: true, children: true },\r\n    });\r\n  }",
+        "snippet": "export async function getTenantByName(subdomain: string) {\r\n    return prisma.tenant.findFirst({\r\n      where: { subdomain },\r\n      include: { settings: true, parent: true, children: true },\r\n    });\r\n  }"
+      },
+      {
+        "name": "getTenants",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "Promise.all",
+          "prisma.tenant.findMany",
+          "prisma.tenant.count"
+        ],
+        "referencedVariables": [
+          "getTenants",
+          "skip",
+          "take",
+          "tenants",
+          "total",
+          "Promise",
+          "all",
+          "prisma",
+          "tenant",
+          "findMany",
+          "where",
+          "deletedAt",
+          "include",
+          "settings",
+          "count"
+        ],
+        "signature": "export async function getTenants({\r\n  skip = 0,\r\n  take = 10,\r\n}: {\r\n  skip?: number;\r\n  take?: number;\r\n}) {\r\n  const [tenants, total] = await Promise.all([\r\n    prisma.tenant.findMany({\r\n      where: { deletedAt: null },\r\n      include: { settings: true },\r\n      skip,\r\n      take,\r\n    }),\r\n    prisma.tenant.count({ where: { deletedAt: null } }),\r\n  ]);\r\n  return { tenants, total };\r\n}",
+        "snippet": "export async function getTenants({\r\n  skip = 0,\r\n  take = 10,\r\n}: {\r\n  skip?: number;\r\n  take?: number;\r\n}) {\r\n  const [tenants, total] = await Promise.all([\r\n    prisma.tenant.findMany({\r\n      where: { deletedAt: null },\r\n      include: { settings: true },\r\n      skip,\r\n      take,\r\n    }),\r\n    prisma.tenant.count({ where: { deletedAt: null } }),\r\n  ]);\r\n  return { tenants, total };\r\n}"
+      },
+      {
+        "name": "createTenantSettings",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// TenantSettings"
+        ],
+        "calledFunctions": [
+          "prisma.tenantSettings.create"
+        ],
+        "referencedVariables": [
+          "createTenantSettings",
+          "data",
+          "Prisma",
+          "TenantSettingsCreateInput",
+          "prisma",
+          "tenantSettings",
+          "create"
+        ],
+        "signature": "export async function createTenantSettings(data: Prisma.TenantSettingsCreateInput) {\r\n  return prisma.tenantSettings.create({ data });\r\n}",
+        "snippet": "export async function createTenantSettings(data: Prisma.TenantSettingsCreateInput) {\r\n  return prisma.tenantSettings.create({ data });\r\n}"
+      },
+      {
+        "name": "updateTenantSettings",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.tenantSettings.update"
+        ],
+        "referencedVariables": [
+          "updateTenantSettings",
+          "tenantId",
+          "data",
+          "Prisma",
+          "TenantSettingsUpdateInput",
+          "prisma",
+          "tenantSettings",
+          "update",
+          "where"
+        ],
+        "signature": "export async function updateTenantSettings(tenantId: string, data: Prisma.TenantSettingsUpdateInput) {\r\n  return prisma.tenantSettings.update({\r\n    where: { tenantId },\r\n    data,\r\n  });\r\n}",
+        "snippet": "export async function updateTenantSettings(tenantId: string, data: Prisma.TenantSettingsUpdateInput) {\r\n  return prisma.tenantSettings.update({\r\n    where: { tenantId },\r\n    data,\r\n  });\r\n}"
+      }
+    ]
+  },
+  {
+    "filePath": "E:/Dev/websites/repairradar-v0.1/src/actions/users/index.ts",
+    "exports": [
+      {
+        "name": "createUser",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// User"
+        ],
+        "calledFunctions": [
+          "prisma.user.create"
+        ],
+        "referencedVariables": [
+          "createUser",
+          "data",
+          "Prisma",
+          "UserUncheckedCreateInput",
+          "prisma",
+          "user",
+          "create"
+        ],
+        "signature": "export async function createUser(data: Prisma.UserUncheckedCreateInput) {\r\n  return prisma.user.create({ data });\r\n}",
+        "snippet": "export async function createUser(data: Prisma.UserUncheckedCreateInput) {\r\n  return prisma.user.create({ data });\r\n}"
+      },
+      {
+        "name": "updateUser",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.user.update"
+        ],
+        "referencedVariables": [
+          "updateUser",
+          "id",
+          "data",
+          "Prisma",
+          "UserUpdateInput",
+          "prisma",
+          "user",
+          "update",
+          "where"
+        ],
+        "signature": "export async function updateUser(id: string, data: Prisma.UserUpdateInput) {\r\n  return prisma.user.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}",
+        "snippet": "export async function updateUser(id: string, data: Prisma.UserUpdateInput) {\r\n  return prisma.user.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}"
+      },
+      {
+        "name": "deleteUser",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.user.update"
+        ],
+        "referencedVariables": [
+          "deleteUser",
+          "id",
+          "prisma",
+          "user",
+          "update",
+          "where",
+          "data",
+          "deletedAt",
+          "Date"
+        ],
+        "signature": "export async function deleteUser(id: string) {\r\n  return prisma.user.update({\r\n    where: { id },\r\n    data: { deletedAt: new Date() },\r\n  });\r\n}",
+        "snippet": "export async function deleteUser(id: string) {\r\n  return prisma.user.update({\r\n    where: { id },\r\n    data: { deletedAt: new Date() },\r\n  });\r\n}"
+      },
+      {
+        "name": "getUser",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.user.findUnique"
+        ],
+        "referencedVariables": [
+          "getUser",
+          "id",
+          "prisma",
+          "user",
+          "findUnique",
+          "where",
+          "include",
+          "tenant"
+        ],
+        "signature": "export async function getUser(id: string) {\r\n  return prisma.user.findUnique({\r\n    where: { id },\r\n    include: { tenant: true },\r\n  });\r\n}",
+        "snippet": "export async function getUser(id: string) {\r\n  return prisma.user.findUnique({\r\n    where: { id },\r\n    include: { tenant: true },\r\n  });\r\n}"
+      },
+      {
+        "name": "getUsers",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "Promise.all",
+          "prisma.user.findMany",
+          "prisma.user.count"
+        ],
+        "referencedVariables": [
+          "getUsers",
+          "tenantId",
+          "skip",
+          "take",
+          "users",
+          "total",
+          "Promise",
+          "all",
+          "prisma",
+          "user",
+          "findMany",
+          "where",
+          "deletedAt",
+          "include",
+          "tenant",
+          "count"
+        ],
+        "signature": "export async function getUsers({\r\n  tenantId,\r\n  skip = 0,\r\n  take = 10,\r\n}: {\r\n  tenantId: string;\r\n  skip?: number;\r\n  take?: number;\r\n}) {\r\n  const [users, total] = await Promise.all([\r\n    prisma.user.findMany({\r\n      where: { tenantId, deletedAt: null },\r\n      include: { tenant: true },\r\n      skip,\r\n      take,\r\n    }),\r\n    prisma.user.count({ where: { tenantId, deletedAt: null } }),\r\n  ]);\r\n  return { users, total };\r\n}",
+        "snippet": "export async function getUsers({\r\n  tenantId,\r\n  skip = 0,\r\n  take = 10,\r\n}: {\r\n  tenantId: string;\r\n  skip?: number;\r\n  take?: number;\r\n}) {\r\n  const [users, total] = await Promise.all([\r\n    prisma.user.findMany({\r\n      where: { tenantId, deletedAt: null },\r\n      include: { tenant: true },\r\n      skip,\r\n      take,\r\n    }),\r\n    prisma.user.count({ where: { tenantId, deletedAt: null } }),\r\n  ]);\r\n  return { users, total };\r\n}"
+      },
+      {
+        "name": "createAccount",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// Account"
+        ],
+        "calledFunctions": [
+          "prisma.account.create"
+        ],
+        "referencedVariables": [
+          "createAccount",
+          "data",
+          "Prisma",
+          "AccountCreateInput",
+          "prisma",
+          "account",
+          "create"
+        ],
+        "signature": "export async function createAccount(data: Prisma.AccountCreateInput) {\r\n  return prisma.account.create({ data });\r\n}",
+        "snippet": "export async function createAccount(data: Prisma.AccountCreateInput) {\r\n  return prisma.account.create({ data });\r\n}"
+      },
+      {
+        "name": "createSession",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// Session"
+        ],
+        "calledFunctions": [
+          "prisma.session.create"
+        ],
+        "referencedVariables": [
+          "createSession",
+          "data",
+          "Prisma",
+          "SessionCreateInput",
+          "prisma",
+          "session",
+          "create"
+        ],
+        "signature": "export async function createSession(data: Prisma.SessionCreateInput) {\r\n  return prisma.session.create({ data });\r\n}",
+        "snippet": "export async function createSession(data: Prisma.SessionCreateInput) {\r\n  return prisma.session.create({ data });\r\n}"
+      },
+      {
+        "name": "deleteSession",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.session.delete"
+        ],
+        "referencedVariables": [
+          "deleteSession",
+          "sessionToken",
+          "prisma",
+          "session",
+          "delete",
+          "where"
+        ],
+        "signature": "export async function deleteSession(sessionToken: string) {\r\n  return prisma.session.delete({\r\n    where: { sessionToken },\r\n  });\r\n}",
+        "snippet": "export async function deleteSession(sessionToken: string) {\r\n  return prisma.session.delete({\r\n    where: { sessionToken },\r\n  });\r\n}"
+      },
+      {
+        "name": "createVerificationToken",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// VerificationToken"
+        ],
+        "calledFunctions": [
+          "prisma.verificationToken.create"
+        ],
+        "referencedVariables": [
+          "createVerificationToken",
+          "data",
+          "Prisma",
+          "VerificationTokenCreateInput",
+          "prisma",
+          "verificationToken",
+          "create"
+        ],
+        "signature": "export async function createVerificationToken(data: Prisma.VerificationTokenCreateInput) {\r\n  return prisma.verificationToken.create({ data });\r\n}",
+        "snippet": "export async function createVerificationToken(data: Prisma.VerificationTokenCreateInput) {\r\n  return prisma.verificationToken.create({ data });\r\n}"
+      }
+    ]
+  },
+  {
+    "filePath": "E:/Dev/websites/repairradar-v0.1/src/actions/vendors/index.ts",
+    "exports": [
+      {
+        "name": "createVendor",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// Vendor"
+        ],
+        "calledFunctions": [
+          "prisma.vendor.create"
+        ],
+        "referencedVariables": [
+          "createVendor",
+          "data",
+          "Prisma",
+          "VendorUncheckedCreateInput",
+          "prisma",
+          "vendor",
+          "create"
+        ],
+        "signature": "export async function createVendor(data: Prisma.VendorUncheckedCreateInput) {\r\n  return prisma.vendor.create({ data });\r\n}",
+        "snippet": "export async function createVendor(data: Prisma.VendorUncheckedCreateInput) {\r\n  return prisma.vendor.create({ data });\r\n}"
+      },
+      {
+        "name": "updateVendor",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.vendor.update"
+        ],
+        "referencedVariables": [
+          "updateVendor",
+          "id",
+          "data",
+          "Prisma",
+          "VendorUpdateInput",
+          "prisma",
+          "vendor",
+          "update",
+          "where"
+        ],
+        "signature": "export async function updateVendor(id: string, data: Prisma.VendorUpdateInput) {\r\n  return prisma.vendor.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}",
+        "snippet": "export async function updateVendor(id: string, data: Prisma.VendorUpdateInput) {\r\n  return prisma.vendor.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}"
+      },
+      {
+        "name": "deleteVendor",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.vendor.update"
+        ],
+        "referencedVariables": [
+          "deleteVendor",
+          "id",
+          "prisma",
+          "vendor",
+          "update",
+          "where",
+          "data",
+          "deletedAt",
+          "Date"
+        ],
+        "signature": "export async function deleteVendor(id: string) {\r\n  return prisma.vendor.update({\r\n    where: { id },\r\n    data: { deletedAt: new Date() },\r\n  });\r\n}",
+        "snippet": "export async function deleteVendor(id: string) {\r\n  return prisma.vendor.update({\r\n    where: { id },\r\n    data: { deletedAt: new Date() },\r\n  });\r\n}"
+      },
+      {
+        "name": "getVendor",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.vendor.findUnique"
+        ],
+        "referencedVariables": [
+          "getVendor",
+          "id",
+          "prisma",
+          "vendor",
+          "findUnique",
+          "where",
+          "include",
+          "parts"
+        ],
+        "signature": "export async function getVendor(id: string) {\r\n  return prisma.vendor.findUnique({\r\n    where: { id },\r\n    include: { parts: true },\r\n  });\r\n}",
+        "snippet": "export async function getVendor(id: string) {\r\n  return prisma.vendor.findUnique({\r\n    where: { id },\r\n    include: { parts: true },\r\n  });\r\n}"
+      },
+      {
+        "name": "getVendorTenantId",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.vendor.findFirst"
+        ],
+        "referencedVariables": [
+          "getVendorTenantId",
+          "tenantId",
+          "prisma",
+          "vendor",
+          "findFirst",
+          "where",
+          "include",
+          "parts"
+        ],
+        "signature": "export async function getVendorTenantId(tenantId: string) {\r\n    return prisma.vendor.findFirst({\r\n      where: { tenantId },\r\n      include: { parts: true },\r\n    });\r\n  }",
+        "snippet": "export async function getVendorTenantId(tenantId: string) {\r\n    return prisma.vendor.findFirst({\r\n      where: { tenantId },\r\n      include: { parts: true },\r\n    });\r\n  }"
+      },
+      {
+        "name": "getVendors",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "Promise.all",
+          "prisma.vendor.findMany",
+          "prisma.vendor.count"
+        ],
+        "referencedVariables": [
+          "getVendors",
+          "tenantId",
+          "skip",
+          "take",
+          "vendors",
+          "total",
+          "Promise",
+          "all",
+          "prisma",
+          "vendor",
+          "findMany",
+          "where",
+          "deletedAt",
+          "count"
+        ],
+        "signature": "export async function getVendors({\r\n  tenantId,\r\n  skip = 0,\r\n  take = 10,\r\n}: {\r\n  tenantId: string;\r\n  skip?: number;\r\n  take?: number;\r\n}) {\r\n  const [vendors, total] = await Promise.all([\r\n    prisma.vendor.findMany({\r\n      where: { tenantId, deletedAt: null },\r\n      skip,\r\n      take,\r\n    }),\r\n    prisma.vendor.count({ where: { tenantId, deletedAt: null } }),\r\n  ]);\r\n  return { vendors, total };\r\n}",
+        "snippet": "export async function getVendors({\r\n  tenantId,\r\n  skip = 0,\r\n  take = 10,\r\n}: {\r\n  tenantId: string;\r\n  skip?: number;\r\n  take?: number;\r\n}) {\r\n  const [vendors, total] = await Promise.all([\r\n    prisma.vendor.findMany({\r\n      where: { tenantId, deletedAt: null },\r\n      skip,\r\n      take,\r\n    }),\r\n    prisma.vendor.count({ where: { tenantId, deletedAt: null } }),\r\n  ]);\r\n  return { vendors, total };\r\n}"
+      },
+      {
+        "name": "createPartVendor",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// PartVendor"
+        ],
+        "calledFunctions": [
+          "prisma.partVendor.create"
+        ],
+        "referencedVariables": [
+          "createPartVendor",
+          "data",
+          "Prisma",
+          "PartVendorCreateInput",
+          "prisma",
+          "partVendor",
+          "create"
+        ],
+        "signature": "export async function createPartVendor(data: Prisma.PartVendorCreateInput) {\r\n  return prisma.partVendor.create({ data });\r\n}",
+        "snippet": "export async function createPartVendor(data: Prisma.PartVendorCreateInput) {\r\n  return prisma.partVendor.create({ data });\r\n}"
+      },
+      {
+        "name": "deletePartVendor",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.partVendor.delete"
+        ],
+        "referencedVariables": [
+          "deletePartVendor",
+          "partId",
+          "vendorId",
+          "prisma",
+          "partVendor",
+          "delete",
+          "where",
+          "partId_vendorId"
+        ],
+        "signature": "export async function deletePartVendor(partId: string, vendorId: string) {\r\n  return prisma.partVendor.delete({\r\n    where: { partId_vendorId: { partId, vendorId } },\r\n  });\r\n}",
+        "snippet": "export async function deletePartVendor(partId: string, vendorId: string) {\r\n  return prisma.partVendor.delete({\r\n    where: { partId_vendorId: { partId, vendorId } },\r\n  });\r\n}"
+      }
+    ]
+  },
+  {
+    "filePath": "E:/Dev/websites/repairradar-v0.1/src/actions/work-orders/index.ts",
+    "exports": [
+      {
+        "name": "createWorkOrder",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// WorkOrder"
+        ],
+        "calledFunctions": [
+          "prisma.workOrder.create"
+        ],
+        "referencedVariables": [
+          "createWorkOrder",
+          "data",
+          "Prisma",
+          "WorkOrderUncheckedCreateInput",
+          "prisma",
+          "workOrder",
+          "create"
+        ],
+        "signature": "export async function createWorkOrder(data: Prisma.WorkOrderUncheckedCreateInput) {\r\n  return prisma.workOrder.create({ data });\r\n}",
+        "snippet": "export async function createWorkOrder(data: Prisma.WorkOrderUncheckedCreateInput) {\r\n  return prisma.workOrder.create({ data });\r\n}"
+      },
+      {
+        "name": "updateWorkOrder",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.workOrder.update"
+        ],
+        "referencedVariables": [
+          "updateWorkOrder",
+          "id",
+          "data",
+          "Prisma",
+          "WorkOrderUncheckedUpdateInput",
+          "prisma",
+          "workOrder",
+          "update",
+          "where"
+        ],
+        "signature": "export async function updateWorkOrder(id: string, data: Prisma.WorkOrderUncheckedUpdateInput) {\r\n  return prisma.workOrder.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}",
+        "snippet": "export async function updateWorkOrder(id: string, data: Prisma.WorkOrderUncheckedUpdateInput) {\r\n  return prisma.workOrder.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}"
+      },
+      {
+        "name": "deleteWorkOrder",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.workOrderAssets.deleteMany",
+          "prisma.workOrderParts.deleteMany",
+          "prisma.workOrder.update"
+        ],
+        "referencedVariables": [
+          "deleteWorkOrder",
+          "id",
+          "prisma",
+          "workOrderAssets",
+          "deleteMany",
+          "where",
+          "workOrderId",
+          "workOrderParts",
+          "workOrder",
+          "update",
+          "data",
+          "deletedAt",
+          "Date"
+        ],
+        "signature": "export async function deleteWorkOrder(id: string) {\r\n  await prisma.workOrderAssets.deleteMany({ where: { workOrderId: id } });\r\n  await prisma.workOrderParts.deleteMany({ where: { workOrderId: id } });\r\n  return prisma.workOrder.update({\r\n    where: { id },\r\n    data: { deletedAt: new Date() },\r\n  });\r\n}",
+        "snippet": "export async function deleteWorkOrder(id: string) {\r\n  await prisma.workOrderAssets.deleteMany({ where: { workOrderId: id } });\r\n  await prisma.workOrderParts.deleteMany({ where: { workOrderId: id } });\r\n  return prisma.workOrder.update({\r\n    where: { id },\r\n    data: { deletedAt: new Date() },\r\n  });\r\n}"
+      },
+      {
+        "name": "getWorkOrder",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.workOrder.findUnique"
+        ],
+        "referencedVariables": [
+          "getWorkOrder",
+          "id",
+          "prisma",
+          "workOrder",
+          "findUnique",
+          "where",
+          "include",
+          "maintenance",
+          "assets",
+          "asset",
+          "parts",
+          "part",
+          "labor",
+          "logs",
+          "assignments"
+        ],
+        "signature": "export async function getWorkOrder(id: string) {\r\n  return prisma.workOrder.findUnique({\r\n    where: { id },\r\n    include: {\r\n      maintenance: true,\r\n      assets: { include: { asset: true } },\r\n      parts: { include: { part: true } },\r\n      labor: true,\r\n      logs: true,\r\n      assignments: true,\r\n    },\r\n  });\r\n}",
+        "snippet": "export async function getWorkOrder(id: string) {\r\n  return prisma.workOrder.findUnique({\r\n    where: { id },\r\n    include: {\r\n      maintenance: true,\r\n      assets: { include: { asset: true } },\r\n      parts: { include: { part: true } },\r\n      labor: true,\r\n      logs: true,\r\n      assignments: true,\r\n    },\r\n  });\r\n}"
+      },
+      {
+        "name": "getWorkOrders",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "Promise.all",
+          "prisma.workOrder.findMany",
+          "prisma.workOrder.count"
+        ],
+        "referencedVariables": [
+          "getWorkOrders",
+          "tenantId",
+          "skip",
+          "take",
+          "workOrders",
+          "total",
+          "Promise",
+          "all",
+          "prisma",
+          "workOrder",
+          "findMany",
+          "where",
+          "deletedAt",
+          "include",
+          "assets",
+          "asset",
+          "maintenance",
+          "count"
+        ],
+        "signature": "export async function getWorkOrders({\r\n  tenantId,\r\n  skip = 0,\r\n  take = 10,\r\n}: {\r\n  tenantId: string;\r\n  skip?: number;\r\n  take?: number;\r\n}) {\r\n  const [workOrders, total] = await Promise.all([\r\n    prisma.workOrder.findMany({\r\n      where: { tenantId, deletedAt: null },\r\n      include: { assets: { include: { asset: true } }, maintenance: true },\r\n      skip,\r\n      take,\r\n    }),\r\n    prisma.workOrder.count({ where: { tenantId, deletedAt: null } }),\r\n  ]);\r\n  return { workOrders, total };\r\n}",
+        "snippet": "export async function getWorkOrders({\r\n  tenantId,\r\n  skip = 0,\r\n  take = 10,\r\n}: {\r\n  tenantId: string;\r\n  skip?: number;\r\n  take?: number;\r\n}) {\r\n  const [workOrders, total] = await Promise.all([\r\n    prisma.workOrder.findMany({\r\n      where: { tenantId, deletedAt: null },\r\n      include: { assets: { include: { asset: true } }, maintenance: true },\r\n      skip,\r\n      take,\r\n    }),\r\n    prisma.workOrder.count({ where: { tenantId, deletedAt: null } }),\r\n  ]);\r\n  return { workOrders, total };\r\n}"
+      },
+      {
+        "name": "createWorkOrderAssignment",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// WorkOrderAssignment"
+        ],
+        "calledFunctions": [
+          "prisma.workOrderAssignment.create"
+        ],
+        "referencedVariables": [
+          "createWorkOrderAssignment",
+          "data",
+          "Prisma",
+          "WorkOrderAssignmentCreateInput",
+          "prisma",
+          "workOrderAssignment",
+          "create"
+        ],
+        "signature": "export async function createWorkOrderAssignment(data: Prisma.WorkOrderAssignmentCreateInput) {\r\n  return prisma.workOrderAssignment.create({ data });\r\n}",
+        "snippet": "export async function createWorkOrderAssignment(data: Prisma.WorkOrderAssignmentCreateInput) {\r\n  return prisma.workOrderAssignment.create({ data });\r\n}"
+      },
+      {
+        "name": "deleteWorkOrderAssignment",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.workOrderAssignment.delete"
+        ],
+        "referencedVariables": [
+          "deleteWorkOrderAssignment",
+          "workOrderId",
+          "userId",
+          "prisma",
+          "workOrderAssignment",
+          "delete",
+          "where",
+          "workOrderId_userId"
+        ],
+        "signature": "export async function deleteWorkOrderAssignment(workOrderId: string, userId: string) {\r\n  return prisma.workOrderAssignment.delete({\r\n    where: { workOrderId_userId: { workOrderId, userId } },\r\n  });\r\n}",
+        "snippet": "export async function deleteWorkOrderAssignment(workOrderId: string, userId: string) {\r\n  return prisma.workOrderAssignment.delete({\r\n    where: { workOrderId_userId: { workOrderId, userId } },\r\n  });\r\n}"
+      },
+      {
+        "name": "createWorkOrderAsset",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// WorkOrderAssets"
+        ],
+        "calledFunctions": [
+          "prisma.workOrderAssets.create"
+        ],
+        "referencedVariables": [
+          "createWorkOrderAsset",
+          "data",
+          "Prisma",
+          "WorkOrderAssetsCreateInput",
+          "prisma",
+          "workOrderAssets",
+          "create"
+        ],
+        "signature": "export async function createWorkOrderAsset(data: Prisma.WorkOrderAssetsCreateInput) {\r\n  return prisma.workOrderAssets.create({ data });\r\n}",
+        "snippet": "export async function createWorkOrderAsset(data: Prisma.WorkOrderAssetsCreateInput) {\r\n  return prisma.workOrderAssets.create({ data });\r\n}"
+      },
+      {
+        "name": "deleteWorkOrderAsset",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.workOrderAssets.delete"
+        ],
+        "referencedVariables": [
+          "deleteWorkOrderAsset",
+          "workOrderId",
+          "assetId",
+          "prisma",
+          "workOrderAssets",
+          "delete",
+          "where",
+          "workOrderId_assetId"
+        ],
+        "signature": "export async function deleteWorkOrderAsset(workOrderId: string, assetId: string) {\r\n  return prisma.workOrderAssets.delete({\r\n    where: { workOrderId_assetId: { workOrderId, assetId } },\r\n  });\r\n}",
+        "snippet": "export async function deleteWorkOrderAsset(workOrderId: string, assetId: string) {\r\n  return prisma.workOrderAssets.delete({\r\n    where: { workOrderId_assetId: { workOrderId, assetId } },\r\n  });\r\n}"
+      },
+      {
+        "name": "createWorkOrderPart",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// WorkOrderParts"
+        ],
+        "calledFunctions": [
+          "prisma.workOrderParts.create"
+        ],
+        "referencedVariables": [
+          "createWorkOrderPart",
+          "data",
+          "Prisma",
+          "WorkOrderPartsCreateInput",
+          "prisma",
+          "workOrderParts",
+          "create"
+        ],
+        "signature": "export async function createWorkOrderPart(data: Prisma.WorkOrderPartsCreateInput) {\r\n    return prisma.workOrderParts.create({ data });\r\n  }",
+        "snippet": "export async function createWorkOrderPart(data: Prisma.WorkOrderPartsCreateInput) {\r\n    return prisma.workOrderParts.create({ data });\r\n  }"
+      },
+      {
+        "name": "deleteWorkOrderPart",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.workOrderParts.delete"
+        ],
+        "referencedVariables": [
+          "deleteWorkOrderPart",
+          "workOrderId",
+          "partId",
+          "prisma",
+          "workOrderParts",
+          "delete",
+          "where",
+          "workOrderId_partId"
+        ],
+        "signature": "export async function deleteWorkOrderPart(workOrderId: string, partId: string) {\r\n    return prisma.workOrderParts.delete({\r\n      where: { workOrderId_partId: { workOrderId, partId } },\r\n    });\r\n  }",
+        "snippet": "export async function deleteWorkOrderPart(workOrderId: string, partId: string) {\r\n    return prisma.workOrderParts.delete({\r\n      where: { workOrderId_partId: { workOrderId, partId } },\r\n    });\r\n  }"
+      },
+      {
+        "name": "createWorkOrderLabor",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// WorkOrderLabor"
+        ],
+        "calledFunctions": [
+          "prisma.workOrderLabor.create"
+        ],
+        "referencedVariables": [
+          "createWorkOrderLabor",
+          "data",
+          "Prisma",
+          "WorkOrderLaborCreateInput",
+          "prisma",
+          "workOrderLabor",
+          "create"
+        ],
+        "signature": "export async function createWorkOrderLabor(data: Prisma.WorkOrderLaborCreateInput) {\r\n  return prisma.workOrderLabor.create({ data });\r\n}",
+        "snippet": "export async function createWorkOrderLabor(data: Prisma.WorkOrderLaborCreateInput) {\r\n  return prisma.workOrderLabor.create({ data });\r\n}"
+      },
+      {
+        "name": "updateWorkOrderLabor",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "prisma.workOrderLabor.update"
+        ],
+        "referencedVariables": [
+          "updateWorkOrderLabor",
+          "id",
+          "data",
+          "Prisma",
+          "WorkOrderLaborUpdateInput",
+          "prisma",
+          "workOrderLabor",
+          "update",
+          "where"
+        ],
+        "signature": "export async function updateWorkOrderLabor(id: string, data: Prisma.WorkOrderLaborUpdateInput) {\r\n  return prisma.workOrderLabor.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}",
+        "snippet": "export async function updateWorkOrderLabor(id: string, data: Prisma.WorkOrderLaborUpdateInput) {\r\n  return prisma.workOrderLabor.update({\r\n    where: { id },\r\n    data,\r\n  });\r\n}"
+      },
+      {
+        "name": "createWorkOrderLog",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// WorkOrderLog"
+        ],
+        "calledFunctions": [
+          "prisma.workOrderLog.create"
+        ],
+        "referencedVariables": [
+          "createWorkOrderLog",
+          "data",
+          "Prisma",
+          "WorkOrderLogCreateInput",
+          "prisma",
+          "workOrderLog",
+          "create"
+        ],
+        "signature": "export async function createWorkOrderLog(data: Prisma.WorkOrderLogCreateInput) {\r\n  return prisma.workOrderLog.create({ data });\r\n}",
+        "snippet": "export async function createWorkOrderLog(data: Prisma.WorkOrderLogCreateInput) {\r\n  return prisma.workOrderLog.create({ data });\r\n}"
+      }
+    ]
+  },
+  {
+    "filePath": "E:/Dev/websites/repairradar-v0.1/src/app/api/[tenant]/dashboard/route.ts",
+    "exports": [
+      {
+        "name": "GET",
+        "kind": "FunctionDeclaration",
+        "documentation": [
+          "// src/app/api/dashboard/route.ts"
+        ],
+        "calledFunctions": [
+          "prisma.tenant.findUnique",
+          "NextResponse.json",
+          "new Date().toISOString"
+        ],
+        "referencedVariables": [
+          "GET",
+          "req",
+          "NextRequest",
+          "params",
+          "tenant",
+          "data",
+          "prisma",
+          "findUnique",
+          "where",
+          "subdomain",
+          "include",
+          "parent",
+          "settings",
+          "users",
+          "categories",
+          "assetTypes",
+          "assets",
+          "meters",
+          "maintenance",
+          "workOrders",
+          "parts",
+          "vendors",
+          "incidents",
+          "children",
+          "Error",
+          "NextResponse",
+          "json",
+          "timestamp",
+          "Date",
+          "toISOString"
+        ],
+        "signature": "export async function GET(req: NextRequest, { params }: { params: { tenant: string } }){\r\n  const {tenant} = await params;\r\n\r\n  const data = await prisma.tenant.findUnique({\r\n    where: { subdomain: tenant },\r\n    include: {\r\n      parent: true,          // Include parent tenant (if exists)\r\n      settings: true,        // Include tenant settings (if exists)\r\n      users: true,           // Include related users\r\n      categories: true,      // Include asset categories\r\n      assetTypes: true,      // Include asset types\r\n      assets: true,          // Include assets\r\n      meters: true,          // Include meters\r\n      maintenance: true,     // Include maintenance schedules\r\n      workOrders: true,      // Include work orders\r\n      parts: true,           // Include parts\r\n      vendors: true,         // Include vendors\r\n      incidents: true,       // Include incidents\r\n      children: true,        // Include child tenants (if exists)\r\n    },\r\n  });\r\n\r\n  if (!data) {\r\n    throw new Error(`Dashboard for: ${tenant} failed fetching data.`); \r\n  }\r\n\r\n  return NextResponse.json({\r\n    tenant: data,\r\n    timestamp: new Date().toISOString()\r\n  })\r\n}",
+        "snippet": "export async function GET(req: NextRequest, { params }: { params: { tenant: string } }){\r\n  const {tenant} = await params;\r\n\r\n  const data = await prisma.tenant.findUnique({\r\n    where: { subdomain: tenant },\r\n    include: {\r\n      parent: true,          // Include parent tenant (if exists)\r\n      settings: true,        // Include tenant settings (if exists)\r\n      users: true,           // Include related users\r\n      categories: true,      // Include asset categories\r\n      assetTypes: true,      // Include asset types\r\n      assets: true,          // Include assets\r\n      meters: true,          // Include meters\r\n      maintenance: true,     // Include maintenance schedules\r\n      workOrders: true,      // Include work orders\r\n      parts: true,           // Include parts\r\n      vendors: true,         // Include vendors\r\n      incidents: true,       // Include incidents\r\n      children: true,        // Include child tenants (if exists)\r\n    },\r\n  });\r\n\r\n  if (!data) {\r\n    throw new"
+      }
+    ]
+  },
+  {
+    "filePath": "E:/Dev/websites/repairradar-v0.1/src/app/api/auth/[...nextauth]/route.ts",
+    "exports": [
+      {
+        "name": "authOptions",
+        "kind": "VariableDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "PrismaAdapter",
+          "CredentialsProvider",
+          "console.log",
+          "prisma.user.findUnique",
+          "bcrypt.compare"
+        ],
+        "referencedVariables": [
+          "authOptions",
+          "NextAuthOptions",
+          "adapter",
+          "PrismaAdapter",
+          "prisma",
+          "session",
+          "strategy",
+          "maxAge",
+          "providers",
+          "CredentialsProvider",
+          "name",
+          "credentials",
+          "employeeId",
+          "label",
+          "type",
+          "password",
+          "authorize",
+          "Error",
+          "console",
+          "log",
+          "user",
+          "findUnique",
+          "where",
+          "include",
+          "tenant",
+          "isValid",
+          "bcrypt",
+          "compare",
+          "callbacks",
+          "jwt",
+          "token",
+          "id",
+          "role",
+          "tenantId",
+          "UserRole",
+          "Tenant",
+          "debug",
+          "process",
+          "env",
+          "NODE_ENV"
+        ],
+        "signature": null,
+        "snippet": "authOptions: NextAuthOptions = {\r\n  adapter: PrismaAdapter(prisma),\r\n  session: {\r\n    strategy: \"jwt\",\r\n    maxAge: 30 * 24 * 60 * 60, // 30 days\r\n  },\r\n  providers: [\r\n    CredentialsProvider({\r\n      name: \"Credentials\",\r\n      credentials: {\r\n        employeeId: { label: \"Employee ID\", type: \"text\" },\r\n        password: { label: \"Password\", type: \"password\" }\r\n      },\r\n      async authorize(credentials) {\r\n        if (!credentials?.employeeId || !credentials?.password) {\r\n          throw new Error(\"Employee ID, password, and tenant are required\");\r\n        }\r\n\r\n        console.log(\"authorize reached\")\r\n\r\n        const user = await prisma.user.findUnique({\r\n          where: {\r\n            employeeId: credentials.employeeId,\r\n          },\r\n          include: {\r\n            tenant: true\r\n          }\r\n        });\r\n\r\n        if (!user) {\r\n          throw new Error(\"Invalid credentials\");\r\n        }\r\n\r\n        if (!user.password) {\r\n          throw new Error(\"Password not set for this u"
+      },
+      {
+        "name": "GET",
+        "kind": "VariableDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "NextAuth"
+        ],
+        "referencedVariables": [
+          "handler",
+          "NextAuth",
+          "authOptions"
+        ],
+        "signature": null,
+        "snippet": "handler = NextAuth(authOptions)"
+      },
+      {
+        "name": "POST",
+        "kind": "VariableDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "NextAuth"
+        ],
+        "referencedVariables": [
+          "handler",
+          "NextAuth",
+          "authOptions"
+        ],
+        "signature": null,
+        "snippet": "handler = NextAuth(authOptions)"
+      }
+    ]
+  },
+  {
+    "filePath": "E:/Dev/websites/repairradar-v0.1/src/app/api/[tenant]/dashboard/events/route.ts",
+    "exports": [
+      {
+        "name": "GET",
+        "kind": "FunctionDeclaration",
+        "documentation": [],
+        "calledFunctions": [
+          "req.headers.get",
+          "requireAuth",
+          "controller.enqueue",
+          "encoder.encode",
+          "JSON.stringify",
+          "controller.error",
+          "console.error",
+          "fetch",
+          "res.json",
+          "sendEvent",
+          "new Date().toISOString",
+          "fetchUpdates",
+          "setInterval",
+          "clearInterval",
+          "controller.close",
+          "console.log"
+        ],
+        "referencedVariables": [
+          "GET",
+          "req",
+          "NextRequest",
+          "params",
+          "tenant",
+          "isInternalCall",
+          "headers",
+          "get",
+          "INTERNAL_SECRET",
+          "requireAuth",
+          "encoder",
+          "TextEncoder",
+          "url",
+          "URL",
+          "nextUrl",
+          "pathname",
+          "stream",
+          "ReadableStream",
+          "start",
+          "controller",
+          "isClosed",
+          "enqueue",
+          "encode",
+          "sendEvent",
+          "data",
+          "JSON",
+          "stringify",
+          "error",
+          "undefined",
+          "console",
+          "fetchUpdates",
+          "res",
+          "fetch",
+          "json",
+          "timestamp",
+          "Date",
+          "toISOString",
+          "type",
+          "message",
+          "updateInterval",
+          "setInterval",
+          "keepAliveInterval",
+          "clearInterval",
+          "close",
+          "cancel",
+          "log",
+          "pull",
+          "highWaterMark",
+          "NextResponse"
+        ],
+        "signature": "export async function GET(req: NextRequest, { params }: { params: { tenant: string } }) {\r\n  const isInternalCall = req.headers.get('x-internal-token') === INTERNAL_SECRET;\r\n  if (!isInternalCall) {\r\n    await requireAuth();\r\n  }\r\n\r\n  const { tenant } = await params;\r\n  const encoder = new TextEncoder();\r\n  const url = new URL(req.nextUrl);\r\n  url.pathname = `/api/${tenant}/dashboard`;\r\n\r\n  const stream = new ReadableStream({\r\n  /* The `stream` in the code snippet is used to create a readable stream in Node.js. In this\r\n  context, it is being used to handle server-sent events (SSE) for real-time updates. The `stream`\r\n  is initialized with an async `start` function that sets up the SSE connection, fetches updates\r\n  from a specified URL, and sends events to the client. */\r\n    async start(controller) {\r\n      let isClosed = false;\r\n      controller.enqueue(encoder.encode('event: connect\\n\\n')); // Initiate SSE connection\r\n      const sendEvent = (data: object) => {\r\n        if (isClosed) return; // Skip if stream is closed\r\n        try {\r\n          controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\\n\\n`));\r\n        } catch (error) {\r\n          controller.error(undefined)\r\n          console.error('SSE send error:', error);\r\n        }\r\n      };\r\n\r\n      const fetchUpdates = async () => {\r\n        try {\r\n          const res = await fetch(url);\r\n          const data = await res.json();\r\n          sendEvent({ ...data.tenant, timestamp: new Date().toISOString() });\r\n        } catch (error) {\r\n          sendEvent({ type: 'error', message: 'Update failed' });\r\n        }\r\n      };\r\n\r\n      // Initial fetch\r\n      await fetchUpdates();\r\n\r\n      // Poll every 5 seconds\r\n      const updateInterval = setInterval(() => {\r\n        if (!isClosed) fetchUpdates(); // Only fetch if stream is active\r\n      }, 5000);\r\n\r\n      // Keep-alive every 30 seconds\r\n      const keepAliveInterval = setInterval(() => {\r\n        if (!isClosed) sendEvent({ type: 'ping', timestamp: new Date().toISOString() });\r\n      }, 30000); // Adjusted back to 30s (was 3000 in your snippet)\r\n\r\n      // Cleanup when stream closes\r\n      return () => {\r\n        isClosed = true;\r\n        clearInterval(updateInterval);\r\n        clearInterval(keepAliveInterval);\r\n        controller.close(); // Explicitly close the controller\r\n      };\r\n    },\r\n\r\n    cancel() {\r\n      console.log(`Stream cancelled for tenant: ${tenant}`);\r\n    },\r\n    pull(controller) {\r\n      controller\r\n    },\r\n  },\r\n  {\r\n    highWaterMark: 10, // Control buffer size\r\n  },\r\n\r\n\r\n);\r\n\r\n  return new NextResponse(stream, {\r\n    headers: {\r\n      'Content-Type': 'text/event-stream',\r\n      'Cache-Control': 'no-cache',\r\n      'Connection': 'keep-alive',\r\n    },\r\n  });\r\n}",
+        "snippet": "export async function GET(req: NextRequest, { params }: { params: { tenant: string } }) {\r\n  const isInternalCall = req.headers.get('x-internal-token') === INTERNAL_SECRET;\r\n  if (!isInternalCall) {\r\n    await requireAuth();\r\n  }\r\n\r\n  const { tenant } = await params;\r\n  const encoder = new TextEncoder();\r\n  const url = new URL(req.nextUrl);\r\n  url.pathname = `/api/${tenant}/dashboard`;\r\n\r\n  const stream = new ReadableStream({\r\n  /* The `stream` in the code snippet is used to create a readable stream in Node.js. In this\r\n  context, it is being used to handle server-sent events (SSE) for real-time updates. The `stream`\r\n  is initialized with an async `start` function that sets up the SSE connection, fetches updates\r\n  from a specified URL, and sends events to the client. */\r\n    async start(controller) {\r\n      let isClosed = false;\r\n      controller.enqueue(encoder.encode('event: connect\\n\\n')); // Initiate SSE connection\r\n      const sendEvent = (data: object) => {\r\n        if (isClose"
+      },
+      {
+        "name": "config",
+        "kind": "VariableDeclaration",
+        "documentation": [],
+        "calledFunctions": [],
+        "referencedVariables": [
+          "config",
+          "api",
+          "bodyParser"
+        ],
+        "signature": null,
+        "snippet": "config = {\r\n  api: { bodyParser: false },\r\n}"
+      }
+    ]
+  }
+]

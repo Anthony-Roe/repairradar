@@ -1,0 +1,195 @@
+{
+  "files": {
+    "prisma\\schema.prisma": {
+      "weight": 33,
+      "role": "Prisma schema for CMMS models (tenants, assets, work orders)",
+      "last_edited": "2025-04-11T10:23:21.807725"
+    },
+    "prisma/schema.prisma": {
+      "weight": 20,
+      "role": "Prisma schema for CMMS models (tenants, assets, work orders)",
+      "last_accessed": "2025-04-11T17:03:06.539480"
+    },
+    "src\\actions\\index.ts": {
+      "weight": 27,
+      "role": "CMMS project file"
+    },
+    "src\\actions\\work-order-actions.ts": {
+      "weight": 30,
+      "role": "CMMS project file",
+      "last_edited": "2025-04-11T10:23:21.808685"
+    },
+    "src\\actions\\assets\\create.ts": {
+      "weight": 30,
+      "role": "CMMS project file",
+      "last_edited": "2025-04-11T10:23:21.809399"
+    },
+    "src\\actions\\assets\\delete.ts": {
+      "weight": 30,
+      "role": "CMMS project file",
+      "last_edited": "2025-04-11T10:23:21.810184"
+    },
+    "src\\actions\\assets\\get.ts": {
+      "weight": 30,
+      "role": "CMMS project file",
+      "last_edited": "2025-04-11T10:23:21.811406"
+    },
+    "src\\actions\\assets\\index.ts": {
+      "weight": 27,
+      "role": "CMMS project file",
+      "last_edited": "2025-04-11T10:23:21.812195"
+    },
+    "src\\actions\\assets\\update.ts": {
+      "weight": 21,
+      "role": "CMMS project file",
+      "last_edited": "2025-04-11T15:20:47.944763"
+    },
+    "src\\actions\\work-orders\\create.ts": {
+      "weight": 3,
+      "role": "CMMS project file",
+      "last_edited": "2025-04-11T10:29:04.274132"
+    },
+    "src\\actions\\assets\\types\\models.ts": {
+      "weight": 3,
+      "role": "Project source file",
+      "last_accessed": "2025-04-11T15:18:07.982259",
+      "last_edited": "2025-04-11T15:18:07.982271"
+    },
+    "E:\\Dev\\websites\\repairradar-v0.1\\src\\actions\\assets\\create.ts": {
+      "weight": 3,
+      "role": "Project source file",
+      "last_accessed": "2025-04-11T15:28:31.375688",
+      "last_edited": "2025-04-11T15:28:31.375693"
+    },
+    "E:\\Dev\\websites\\repairradar-v0.1\\src\\actions\\assets\\delete.ts": {
+      "weight": 3,
+      "role": "Project source file",
+      "last_accessed": "2025-04-11T15:28:31.377142",
+      "last_edited": "2025-04-11T15:28:31.377147"
+    },
+    "E:\\Dev\\websites\\repairradar-v0.1\\src\\actions\\assets\\get.ts": {
+      "weight": 3,
+      "role": "Project source file",
+      "last_accessed": "2025-04-11T15:28:31.378377",
+      "last_edited": "2025-04-11T15:28:31.378382"
+    },
+    "E:\\Dev\\websites\\repairradar-v0.1\\src\\actions\\assets\\index.ts": {
+      "weight": 3,
+      "role": "Project source file",
+      "last_accessed": "2025-04-11T15:28:31.379619",
+      "last_edited": "2025-04-11T15:28:31.379624"
+    },
+    "E:\\Dev\\websites\\repairradar-v0.1\\src\\actions\\assets\\update.ts": {
+      "weight": 12,
+      "role": "Project source file",
+      "last_accessed": "2025-04-11T15:28:31.380856",
+      "last_edited": "2025-04-11T17:09:51.007833"
+    },
+    "src/actions/assets/create.ts": {
+      "weight": 5,
+      "role": "Project source file",
+      "last_accessed": "2025-04-11T17:03:06.539854"
+    },
+    "src/actions/assets/delete.ts": {
+      "weight": 4,
+      "role": "Project source file",
+      "last_accessed": "2025-04-11T17:01:38.823314"
+    },
+    "src/actions/assets/get.ts": {
+      "weight": 4,
+      "role": "Project source file",
+      "last_accessed": "2025-04-11T17:01:38.823404"
+    },
+    "src/actions/assets/index.ts": {
+      "weight": 3,
+      "role": "Project source file",
+      "last_accessed": "2025-04-11T17:03:06.539933"
+    },
+    "src/actions/assets/update.ts": {
+      "weight": 5,
+      "role": "Project source file",
+      "last_accessed": "2025-04-11T17:01:38.823482"
+    },
+    "src/lib/prisma-extended.ts": {
+      "weight": 1,
+      "role": "Project source file",
+      "last_accessed": "2025-04-11T15:42:37.035527"
+    },
+    "src\\actions\\work-orders\\notes\\add.ts": {
+      "weight": 3,
+      "role": "Project source file",
+      "last_accessed": "2025-04-11T16:53:05.691029",
+      "last_edited": "2025-04-11T16:53:05.691040"
+    },
+    "src/actions/index.ts": {
+      "weight": 2,
+      "role": "Project source file",
+      "last_accessed": "2025-04-11T17:01:38.823579"
+    },
+    "src/actions/work-order-actions.ts": {
+      "weight": 4,
+      "role": "Project source file",
+      "last_accessed": "2025-04-11T17:03:06.540088"
+    },
+    "src/actions/work-orders/create.ts": {
+      "weight": 2,
+      "role": "Project source file",
+      "last_accessed": "2025-04-11T17:01:38.823744"
+    },
+    "src/app/page.tsx": {
+      "weight": 3,
+      "role": "Next.js page",
+      "last_accessed": "2025-04-11T17:03:06.539583"
+    },
+    "src/components/EditDialog.tsx": {
+      "weight": 2,
+      "role": "Project source file",
+      "last_accessed": "2025-04-11T17:01:38.823919"
+    },
+    "src\\components\\EditDialog.tsx": {
+      "weight": 3,
+      "role": "Project source file",
+      "last_accessed": "2025-04-11T16:56:11.284003",
+      "last_edited": "2025-04-11T16:56:11.284013"
+    },
+    "src\\components\\ui\\calendar.tsx": {
+      "weight": 3,
+      "role": "Project source file",
+      "last_accessed": "2025-04-11T16:57:17.855760",
+      "last_edited": "2025-04-11T16:57:17.855771"
+    },
+    "E:\\Dev\\websites\\repairradar-v0.1\\prisma\\schema.prisma": {
+      "weight": 6,
+      "role": "Prisma schema",
+      "last_accessed": "2025-04-11T17:00:11.710251",
+      "last_edited": "2025-04-11T17:08:12.930246"
+    },
+    "src/app/layout.tsx": {
+      "weight": 1,
+      "role": "Next.js layout",
+      "last_accessed": "2025-04-11T17:03:06.539674"
+    },
+    "src/components/ui/button.tsx": {
+      "weight": 1,
+      "role": "Project source file",
+      "last_accessed": "2025-04-11T17:03:06.539769"
+    },
+    "src/components/ui/index.ts": {
+      "weight": 1,
+      "role": "Project source file",
+      "last_accessed": "2025-04-11T17:03:06.540174"
+    },
+    "src/lib/prisma.ts": {
+      "weight": 1,
+      "role": "Project source file",
+      "last_accessed": "2025-04-11T17:03:06.540261"
+    },
+    "src\\lib\\prisma.ts": {
+      "weight": 3,
+      "role": "Project source file",
+      "last_accessed": "2025-04-11T17:03:08.557190",
+      "last_edited": "2025-04-11T17:03:08.557200"
+    }
+  },
+  "last_updated": "2025-04-11T17:09:44.526864"
+}

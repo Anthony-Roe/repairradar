@@ -1,0 +1,10 @@
+I'm sharing a Next.js project split across multiple files. Each file contains a compressed chunk. Here's how to process them:
+
+1. Combine all chunks in order (part001, part002, etc.)
+2. Extract the 'content' field from each chunk's JSON
+3. Concatenate all content strings
+4. Base64 decode → zlib decompress → JSON parse
+5. You'll get a complete file structure with:
+   - Paths
+   - File contents (base64 encoded)
+   - Validation hashes
